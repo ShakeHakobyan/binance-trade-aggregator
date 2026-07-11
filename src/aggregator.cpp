@@ -3,7 +3,7 @@
 Aggregator::Aggregator(int64_t windowMs, TradeQueue &queue) : windowMs_(windowMs), queue_(queue) {
 }
 
-void Aggregator::onTrade(const Trade &trade) {
+void Aggregator::processTrade(const Trade &trade) {
     int64_t windowStart = trade.tradeTimeMs - (trade.tradeTimeMs % windowMs_);
 
     std::lock_guard<std::mutex> lock(mutex_);
@@ -13,7 +13,7 @@ void Aggregator::onTrade(const Trade &trade) {
 void Aggregator::run() {
     while (true) {
         Trade trade = queue_.pop();
-        onTrade(trade);
+        processTrade(trade);
     }
 }
 

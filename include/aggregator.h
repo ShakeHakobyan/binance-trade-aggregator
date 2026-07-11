@@ -15,12 +15,10 @@ using StatsBySymbolAndTimeWindow = std::map<std::string, std::unordered_map<int6
 class Aggregator {
   public:
     Aggregator(int64_t windowMs, TradeQueue &queue);
+    void processTrade(const Trade &trade);
 
     void run();
-
     StatsBySymbolAndTimeWindow extractClosedWindows(int64_t nowMs);
-
-    void onTrade(const Trade &trade);
 
   private:
     int64_t windowMs_;

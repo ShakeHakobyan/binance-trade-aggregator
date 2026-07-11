@@ -33,9 +33,10 @@ find_package(GTest REQUIRED CONFIG)
 add_executable(unit_tests
     tests/test_json_trade_parser.cpp
     tests/test_trade_queue.cpp
-    tests/test_window_stats.cpp
+    tests/test_aggregator.cpp
     src/json_trade_parser.cpp
     src/trade_queue.cpp
+    src/aggregator.cpp
     src/window_stats.cpp
 )
 
