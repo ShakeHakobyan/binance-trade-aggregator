@@ -1,0 +1,15 @@
+#pragma once
+
+#include "trade.h"
+#include <nlohmann/json.hpp>
+#include <string>
+#include <optional>
+
+using json = nlohmann::json;
+
+class JsonTradeParser {
+public:
+    static std::optional<json> parseJson(const std::string &rawMessage);
+    static bool extractTrade(const json &data, Trade &outTrade);
+    static bool parse(const std::string &rawMessage, Trade &outTrade);
+};
