@@ -27,20 +27,19 @@ WindowStats makeStats(uint64_t trades, double volume, double minPrice, double ma
     return s;
 }
 
-void expectWindowsEqual(const StatsBySymbolAndTimeWindow &expected,
-                        const StatsBySymbolAndTimeWindow &actual) {
+void expectWindowsEqual(const StatsByTimeWindow &expected, const StatsByTimeWindow &actual) {
     ASSERT_EQ(expected.size(), actual.size());
 
-    for (const auto &[symbol, expectedWindows] : expected) {
-        ASSERT_TRUE(actual.count(symbol) > 0) << "Missing symbol: " << symbol;
+    for (const auto &[windowStart, expectedSymbols] : expected) {
+        ASSERT_TRUE(actual.count(windowStart) > 0) << "Missing window: " << windowStart;
 
-        const auto &actualWindows = actual.at(symbol);
-        ASSERT_EQ(expectedWindows.size(), actualWindows.size()) << "Symbol: " << symbol;
+        const auto &actualSymbols = actual.at(windowStart);
+        ASSERT_EQ(expectedSymbols.size(), actualSymbols.size()) << "Window: " << windowStart;
 
-        for (const auto &[windowStart, expectedStats] : expectedWindows) {
-            ASSERT_TRUE(actualWindows.count(windowStart) > 0) << symbol << "@" << windowStart;
+        for (const auto &[symbol, expectedStats] : expectedSymbols) {
+            ASSERT_TRUE(actualSymbols.count(symbol) > 0) << symbol << "@" << windowStart;
 
-            const WindowStats &actualStats = actualWindows.at(windowStart);
+            const WindowStats &actualStats = actualSymbols.at(symbol);
 
             EXPECT_EQ(expectedStats.tradesNum, actualStats.tradesNum)
                 << symbol << "@" << windowStart;
@@ -65,7 +64,7 @@ TEST(AggregatorTest, EmptyStoreReturnsNoWindows) {
     TradeQueue queue;
     Aggregator agg(windowMs, queue);
 
-    StatsBySymbolAndTimeWindow expected;
+    StatsByTimeWindow expected;
 
     auto actual = agg.extractClosedWindows(windowMs);
 
@@ -82,12 +81,12 @@ TEST(AggregatorTest, OpenWindowIsNotReturnedUntilClosed) {
     Aggregator agg(windowMs, queue);
     agg.processTrade(makeTrade("BTCUSDT", 100.0, 1.0, windowStart, false));
 
-    StatsBySymbolAndTimeWindow expectedStillOpen;
+    StatsByTimeWindow expectedStillOpen;
     auto actualStillOpen = agg.extractClosedWindows(timeJustBeforeClose);
     expectWindowsEqual(expectedStillOpen, actualStillOpen);
 
-    StatsBySymbolAndTimeWindow expectedClosed;
-    expectedClosed["BTCUSDT"][windowStart] = makeStats(1, 100.0, 100.0, 100.0, 1, 0);
+    StatsByTimeWindow expectedClosed;
+    expectedClosed[windowStart]["BTCUSDT"] = makeStats(1, 100.0, 100.0, 100.0, 1, 0);
     auto actualClosed = agg.extractClosedWindows(timeAtClose);
     expectWindowsEqual(expectedClosed, actualClosed);
 }
@@ -111,8 +110,8 @@ TEST(AggregatorTest, MultipleTradesSameWindowAggregateCorrectly) {
     double expectedVolume =
         priceBuyOne * quantity + priceSell * sellQuantity + priceBuyTwo * quantity;
 
-    StatsBySymbolAndTimeWindow expected;
-    expected["BTCUSDT"][windowStart] = makeStats(3, expectedVolume, priceSell, priceBuyTwo, 2, 1);
+    StatsByTimeWindow expected;
+    expected[windowStart]["BTCUSDT"] = makeStats(3, expectedVolume, priceSell, priceBuyTwo, 2, 1);
 
     auto actual = agg.extractClosedWindows(windowStart + windowMs);
 
@@ -129,9 +128,9 @@ TEST(AggregatorTest, TradesSplitAcrossDifferentWindows) {
     agg.processTrade(makeTrade("BTCUSDT", 100.0, 1.0, 500, false));
     agg.processTrade(makeTrade("BTCUSDT", 200.0, 1.0, 1200, false));
 
-    StatsBySymbolAndTimeWindow expected;
-    expected["BTCUSDT"][firstWindowStart] = makeStats(1, 100.0, 100.0, 100.0, 1, 0);
-    expected["BTCUSDT"][secondWindowStart] = makeStats(1, 200.0, 200.0, 200.0, 1, 0);
+    StatsByTimeWindow expected;
+    expected[firstWindowStart]["BTCUSDT"] = makeStats(1, 100.0, 100.0, 100.0, 1, 0);
+    expected[secondWindowStart]["BTCUSDT"] = makeStats(1, 200.0, 200.0, 200.0, 1, 0);
 
     auto actual = agg.extractClosedWindows(secondWindowStart + windowMs);
 
@@ -147,9 +146,9 @@ TEST(AggregatorTest, DifferentSymbolsAreIndependent) {
     agg.processTrade(makeTrade("BTCUSDT", 100.0, 1.0, windowStart, false));
     agg.processTrade(makeTrade("ETHUSDT", 50.0, 2.0, windowStart, true));
 
-    StatsBySymbolAndTimeWindow expected;
-    expected["BTCUSDT"][windowStart] = makeStats(1, 100.0, 100.0, 100.0, 1, 0);
-    expected["ETHUSDT"][windowStart] = makeStats(1, 100.0, 50.0, 50.0, 0, 1);
+    StatsByTimeWindow expected;
+    expected[windowStart]["BTCUSDT"] = makeStats(1, 100.0, 100.0, 100.0, 1, 0);
+    expected[windowStart]["ETHUSDT"] = makeStats(1, 100.0, 50.0, 50.0, 0, 1);
 
     auto actual = agg.extractClosedWindows(windowStart + windowMs);
 
@@ -164,12 +163,12 @@ TEST(AggregatorTest, ExtractedWindowsAreRemovedFromStore) {
     Aggregator agg(windowMs, queue);
     agg.processTrade(makeTrade("BTCUSDT", 100.0, 1.0, windowStart, false));
 
-    StatsBySymbolAndTimeWindow expectedFirst;
-    expectedFirst["BTCUSDT"][windowStart] = makeStats(1, 100.0, 100.0, 100.0, 1, 0);
+    StatsByTimeWindow expectedFirst;
+    expectedFirst[windowStart]["BTCUSDT"] = makeStats(1, 100.0, 100.0, 100.0, 1, 0);
     auto actualFirst = agg.extractClosedWindows(windowStart + windowMs);
     expectWindowsEqual(expectedFirst, actualFirst);
 
-    StatsBySymbolAndTimeWindow expectedSecond;
+    StatsByTimeWindow expectedSecond;
     auto actualSecond = agg.extractClosedWindows(windowStart + windowMs * 2);
     expectWindowsEqual(expectedSecond, actualSecond);
 }
@@ -182,8 +181,8 @@ TEST(AggregatorTest, TradeExactlyOnWindowBoundaryGoesToNewWindow) {
     Aggregator agg(windowMs, queue);
     agg.processTrade(makeTrade("BTCUSDT", 100.0, 1.0, boundaryTime, false));
 
-    StatsBySymbolAndTimeWindow expected;
-    expected["BTCUSDT"][boundaryTime] = makeStats(1, 100.0, 100.0, 100.0, 1, 0);
+    StatsByTimeWindow expected;
+    expected[boundaryTime]["BTCUSDT"] = makeStats(1, 100.0, 100.0, 100.0, 1, 0);
 
     auto actual = agg.extractClosedWindows(boundaryTime + windowMs);
 
@@ -200,8 +199,8 @@ TEST(AggregatorTest, OnlyFullyClosedWindowsAreExtractedWhenMixed) {
     agg.processTrade(makeTrade("BTCUSDT", 100.0, 1.0, firstWindowStart, false));
     agg.processTrade(makeTrade("BTCUSDT", 200.0, 1.0, secondWindowStart + 200, false));
 
-    StatsBySymbolAndTimeWindow expected;
-    expected["BTCUSDT"][firstWindowStart] = makeStats(1, 100.0, 100.0, 100.0, 1, 0);
+    StatsByTimeWindow expected;
+    expected[firstWindowStart]["BTCUSDT"] = makeStats(1, 100.0, 100.0, 100.0, 1, 0);
 
     auto actual = agg.extractClosedWindows(firstWindowStart + windowMs);
 

@@ -10,7 +10,8 @@
 #include <string>
 #include <unordered_map>
 
-using StatsBySymbolAndTimeWindow = std::map<std::string, std::unordered_map<int64_t, WindowStats>>;
+using WindowContents = std::unordered_map<std::string, WindowStats>;
+using StatsByTimeWindow = std::map<int64_t, WindowContents>;
 
 class Aggregator {
   public:
@@ -18,12 +19,12 @@ class Aggregator {
     void processTrade(const Trade &trade);
 
     void run();
-    StatsBySymbolAndTimeWindow extractClosedWindows(int64_t nowMs);
+    StatsByTimeWindow extractClosedWindows(int64_t nowMs);
 
   private:
     int64_t windowMs_;
     TradeQueue &queue_;
 
     std::mutex mutex_;
-    StatsBySymbolAndTimeWindow data_;
+    StatsByTimeWindow data_;
 };

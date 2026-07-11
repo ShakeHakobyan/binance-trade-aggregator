@@ -7,7 +7,7 @@ void Aggregator::processTrade(const Trade &trade) {
     int64_t windowStart = trade.tradeTimeMs - (trade.tradeTimeMs % windowMs_);
 
     std::lock_guard<std::mutex> lock(mutex_);
-    data_[trade.symbol][windowStart].update(trade);
+    data_[windowStart][trade.symbol].update(trade);
 }
 
 void Aggregator::run() {
@@ -17,27 +17,18 @@ void Aggregator::run() {
     }
 }
 
-StatsBySymbolAndTimeWindow Aggregator::extractClosedWindows(int64_t nowMs) {
-    StatsBySymbolAndTimeWindow closed;
+StatsByTimeWindow Aggregator::extractClosedWindows(int64_t nowMs) {
+    StatsByTimeWindow closed;
 
     std::lock_guard<std::mutex> lock(mutex_);
-    for (auto symbolIt = data_.begin(); symbolIt != data_.end();) {
-        auto &windowsForSymbol = symbolIt->second;
+    for (auto windowIt = data_.begin(); windowIt != data_.end();) {
+        int64_t windowStart = windowIt->first;
 
-        for (auto windowIt = windowsForSymbol.begin(); windowIt != windowsForSymbol.end();) {
-            int64_t windowStart = windowIt->first;
-            if (windowStart + windowMs_ <= nowMs) {
-                closed[symbolIt->first][windowStart] = windowIt->second;
-                windowIt = windowsForSymbol.erase(windowIt);
-            } else {
-                ++windowIt;
-            }
-        }
-
-        if (windowsForSymbol.empty()) {
-            symbolIt = data_.erase(symbolIt);
+        if (windowStart + windowMs_ <= nowMs) {
+            closed[windowStart] = std::move(windowIt->second);
+            windowIt = data_.erase(windowIt);
         } else {
-            ++symbolIt;
+            ++windowIt;
         }
     }
 
