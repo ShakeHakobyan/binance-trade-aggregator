@@ -10,6 +10,6 @@ void WindowStats::update(const Trade &trade) {
     minPrice = std::min(minPrice, trade.price);
     maxPrice = std::max(maxPrice, trade.price);
 
-    buyCount += trade.isBuyerMaker;
-    sellCount += !trade.isBuyerMaker;
+    buyCount += !trade.isBuyerMaker;
+    sellCount += trade.isBuyerMaker;
 }
