@@ -22,3 +22,14 @@ cmake --build .
 - `JsonTradeParser` — parses raw WebSocket messages into `Trade` objects.
 - `TradeQueue` — thread-safe queue passing `Trade` objects from the network
   thread to the aggregation thread.
+
+## Testing
+
+Unit tests use GoogleTest and cover `JsonTradeParser` and `TradeQueue`.
+
+Run tests:
+
+```bash
+cd build
+./unit_tests
+```

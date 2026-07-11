@@ -24,3 +24,24 @@ target_link_libraries(binance_service
     OpenSSL::Crypto
     nlohmann_json::nlohmann_json
 )
+
+enable_testing()
+find_package(GTest REQUIRED CONFIG)
+
+add_executable(unit_tests
+    tests/test_json_trade_parser.cpp
+    tests/test_trade_queue.cpp
+    src/json_trade_parser.cpp
+    src/trade_queue.cpp
+)
+
+target_include_directories(unit_tests PRIVATE include)
+
+target_link_libraries(unit_tests
+    PRIVATE
+    GTest::gtest
+    GTest::gtest_main
+    nlohmann_json::nlohmann_json
+)
+
+add_test(NAME unit_tests COMMAND unit_tests)
