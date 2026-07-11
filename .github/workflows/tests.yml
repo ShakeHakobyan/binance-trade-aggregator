@@ -1,0 +1,37 @@
+name: Unit Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y cmake g++ python3-pip
+          pip3 install conan
+
+      - name: Install Conan dependencies
+        run: |
+          conan profile detect --force
+          conan install . --output-folder=build --build=missing
+
+      - name: Configure
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake
+
+      - name: Build
+        run: |
+          cmake --build build
+
+      - name: Run unit tests
+        run: |
+          ./build/unit_tests
