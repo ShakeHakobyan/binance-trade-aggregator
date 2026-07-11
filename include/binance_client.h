@@ -10,6 +10,9 @@
 
 #include "trade_queue.h"
 
+using tcp = boost::asio::ip::tcp;
+using WebSocket = boost::beast::websocket::stream<boost::beast::ssl_stream<tcp::socket>>;
+
 class BinanceClient {
   public:
     BinanceClient(std::vector<std::string> pairs, TradeQueue &queue);
@@ -17,10 +20,6 @@ class BinanceClient {
     void run();
 
   private:
-    using tcp = boost::asio::ip::tcp;
-
-    using WebSocket = boost::beast::websocket::stream<boost::beast::ssl_stream<tcp::socket>>;
-
     void connect(WebSocket &ws, tcp::resolver &resolver);
     void handshake(WebSocket &ws);
     void setupControl(WebSocket &ws);
@@ -28,7 +27,6 @@ class BinanceClient {
     void readLoop(WebSocket &ws);
     void connectAndListen();
 
-  private:
     std::vector<std::string> pairs_;
     TradeQueue &queue_;
 };
