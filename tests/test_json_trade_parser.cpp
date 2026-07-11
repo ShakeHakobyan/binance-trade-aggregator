@@ -1,7 +1,7 @@
 #include "json_trade_parser.h"
 #include <gtest/gtest.h>
 
-TEST(JsonTradeParser, ParsesDifferentValidTrade) {
+TEST(JsonTradeParserTest, ParsesDifferentValidTrade) {
     std::string raw = R"({
         "stream": "ethusdt@trade",
         "data": {
@@ -25,7 +25,7 @@ TEST(JsonTradeParser, ParsesDifferentValidTrade) {
     EXPECT_TRUE(trade.isBuyerMaker);
 }
 
-TEST(JsonTradeParser, RejectsMissingSymbol) {
+TEST(JsonTradeParserTest, RejectsMissingSymbol) {
     std::string raw = R"({
         "data": {
             "p": "100",
@@ -40,7 +40,7 @@ TEST(JsonTradeParser, RejectsMissingSymbol) {
     EXPECT_FALSE(ok);
 }
 
-TEST(JsonTradeParser, RejectsMissingPrice) {
+TEST(JsonTradeParserTest, RejectsMissingPrice) {
     std::string raw = R"({
         "data": {
             "s": "BTCUSDT",
@@ -55,7 +55,7 @@ TEST(JsonTradeParser, RejectsMissingPrice) {
     EXPECT_FALSE(ok);
 }
 
-TEST(JsonTradeParser, RejectsMissingQuantity) {
+TEST(JsonTradeParserTest, RejectsMissingQuantity) {
     std::string raw = R"({
         "data": {
             "s": "BTCUSDT",
@@ -70,7 +70,7 @@ TEST(JsonTradeParser, RejectsMissingQuantity) {
     EXPECT_FALSE(ok);
 }
 
-TEST(JsonTradeParser, RejectsMissingTimestamp) {
+TEST(JsonTradeParserTest, RejectsMissingTimestamp) {
     std::string raw = R"({
         "data": {
             "s": "BTCUSDT",
@@ -85,7 +85,7 @@ TEST(JsonTradeParser, RejectsMissingTimestamp) {
     EXPECT_FALSE(ok);
 }
 
-TEST(JsonTradeParser, RejectsWrongPriceType) {
+TEST(JsonTradeParserTest, RejectsWrongPriceType) {
     std::string raw = R"({
         "data": {
             "s": "BTCUSDT",
@@ -101,7 +101,7 @@ TEST(JsonTradeParser, RejectsWrongPriceType) {
     EXPECT_FALSE(ok);
 }
 
-TEST(JsonTradeParser, RejectsWrongBooleanType) {
+TEST(JsonTradeParserTest, RejectsWrongBooleanType) {
     std::string raw = R"({
         "data": {
             "s": "BTCUSDT",
@@ -117,7 +117,7 @@ TEST(JsonTradeParser, RejectsWrongBooleanType) {
     EXPECT_FALSE(ok);
 }
 
-TEST(JsonTradeParser, RejectsEmptyDataObject) {
+TEST(JsonTradeParserTest, RejectsEmptyDataObject) {
     std::string raw = R"({
         "data": {}
     })";
@@ -127,7 +127,7 @@ TEST(JsonTradeParser, RejectsEmptyDataObject) {
     EXPECT_FALSE(ok);
 }
 
-TEST(JsonTradeParser, RejectsEmptyMessage) {
+TEST(JsonTradeParserTest, RejectsEmptyMessage) {
     std::string raw = "";
 
     Trade trade;
@@ -135,7 +135,7 @@ TEST(JsonTradeParser, RejectsEmptyMessage) {
     EXPECT_FALSE(ok);
 }
 
-TEST(JsonTradeParser, RejectsNullData) {
+TEST(JsonTradeParserTest, RejectsNullData) {
     std::string raw = R"({
         "data": null
     })";
@@ -145,7 +145,7 @@ TEST(JsonTradeParser, RejectsNullData) {
     EXPECT_FALSE(ok);
 }
 
-TEST(JsonTradeParser, ParsesVerySmallQuantity) {
+TEST(JsonTradeParserTest, ParsesVerySmallQuantity) {
     std::string raw = R"({
         "data": {
             "s": "BTCUSDT",

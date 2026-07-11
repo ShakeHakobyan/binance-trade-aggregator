@@ -2,7 +2,7 @@
 
 #include "window_stats.h"
 
-TEST(WindowStats, UpdatesSingleTrade) {
+TEST(WindowStatsTest, UpdatesSingleTrade) {
     WindowStats stats;
 
     Trade trade{.price = 100.0, .quantity = 2.0, .isBuyerMaker = true};
@@ -17,7 +17,7 @@ TEST(WindowStats, UpdatesSingleTrade) {
     EXPECT_EQ(stats.sellCount, 0);
 }
 
-TEST(WindowStats, AggregatesMultipleTrades) {
+TEST(WindowStatsTest, AggregatesMultipleTrades) {
     WindowStats stats;
 
     Trade buy{.price = 100.0, .quantity = 2.0, .isBuyerMaker = true};
@@ -35,7 +35,7 @@ TEST(WindowStats, AggregatesMultipleTrades) {
     EXPECT_EQ(stats.sellCount, 1);
 }
 
-TEST(WindowStats, UpdatesMinAndMaxPrice) {
+TEST(WindowStatsTest, UpdatesMinAndMaxPrice) {
     WindowStats stats;
 
     stats.update(Trade{.price = 200.0, .quantity = 1.0, .isBuyerMaker = true});

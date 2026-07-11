@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <thread>
 
-TEST(TradeQueue, PushThenPopReturnsSameTrade) {
+TEST(TradeQueueTest, PushThenPopReturnsSameTrade) {
     TradeQueue queue;
     Trade trade;
     trade.symbol = "BTCUSDT";
@@ -16,7 +16,7 @@ TEST(TradeQueue, PushThenPopReturnsSameTrade) {
     EXPECT_DOUBLE_EQ(result.price, 100.0);
 }
 
-TEST(TradeQueue, PopBlocksUntilPush) {
+TEST(TradeQueueTest, PopBlocksUntilPush) {
     TradeQueue queue;
     bool popped = false;
 
@@ -36,7 +36,7 @@ TEST(TradeQueue, PopBlocksUntilPush) {
     EXPECT_TRUE(popped);
 }
 
-TEST(TradeQueue, PreservesOrderFIFO) {
+TEST(TradeQueueTest, PreservesOrderFIFO) {
     TradeQueue queue;
 
     Trade first;
@@ -51,7 +51,7 @@ TEST(TradeQueue, PreservesOrderFIFO) {
     EXPECT_EQ(queue.pop().symbol, "ETHUSDT");
 }
 
-TEST(TradeQueue, HandlesMultiplePushes) {
+TEST(TradeQueueTest, HandlesMultiplePushes) {
     TradeQueue queue;
 
     auto producer = [&queue](std::string symbol) {
