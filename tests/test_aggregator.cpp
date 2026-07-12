@@ -15,18 +15,6 @@ Trade makeTrade(const std::string &symbol, double price, double qty, int64_t tim
     return t;
 }
 
-WindowStats makeStats(uint64_t trades, double volume, double minPrice, double maxPrice,
-                      uint64_t buyCount, uint64_t sellCount) {
-    WindowStats s;
-    s.tradesNum = trades;
-    s.volume = volume;
-    s.minPrice = minPrice;
-    s.maxPrice = maxPrice;
-    s.buyCount = buyCount;
-    s.sellCount = sellCount;
-    return s;
-}
-
 void expectWindowsEqual(const StatsByTimeWindow &expected, const StatsByTimeWindow &actual) {
     ASSERT_EQ(expected.size(), actual.size());
 
@@ -86,7 +74,7 @@ TEST(AggregatorTest, OpenWindowIsNotReturnedUntilClosed) {
     expectWindowsEqual(expectedStillOpen, actualStillOpen);
 
     StatsByTimeWindow expectedClosed;
-    expectedClosed[windowStart]["BTCUSDT"] = makeStats(1, 100.0, 100.0, 100.0, 1, 0);
+    expectedClosed[windowStart]["BTCUSDT"] = WindowStats(1, 100.0, 100.0, 100.0, 1, 0);
     auto actualClosed = agg.extractClosedWindows(timeAtClose);
     expectWindowsEqual(expectedClosed, actualClosed);
 }
@@ -111,7 +99,7 @@ TEST(AggregatorTest, MultipleTradesSameWindowAggregateCorrectly) {
         priceBuyOne * quantity + priceSell * sellQuantity + priceBuyTwo * quantity;
 
     StatsByTimeWindow expected;
-    expected[windowStart]["BTCUSDT"] = makeStats(3, expectedVolume, priceSell, priceBuyTwo, 2, 1);
+    expected[windowStart]["BTCUSDT"] = WindowStats(3, expectedVolume, priceSell, priceBuyTwo, 2, 1);
 
     auto actual = agg.extractClosedWindows(windowStart + windowMs);
 
@@ -129,8 +117,8 @@ TEST(AggregatorTest, TradesSplitAcrossDifferentWindows) {
     agg.processTrade(makeTrade("BTCUSDT", 200.0, 1.0, 1200, false));
 
     StatsByTimeWindow expected;
-    expected[firstWindowStart]["BTCUSDT"] = makeStats(1, 100.0, 100.0, 100.0, 1, 0);
-    expected[secondWindowStart]["BTCUSDT"] = makeStats(1, 200.0, 200.0, 200.0, 1, 0);
+    expected[firstWindowStart]["BTCUSDT"] = WindowStats(1, 100.0, 100.0, 100.0, 1, 0);
+    expected[secondWindowStart]["BTCUSDT"] = WindowStats(1, 200.0, 200.0, 200.0, 1, 0);
 
     auto actual = agg.extractClosedWindows(secondWindowStart + windowMs);
 
@@ -147,8 +135,8 @@ TEST(AggregatorTest, DifferentSymbolsAreIndependent) {
     agg.processTrade(makeTrade("ETHUSDT", 50.0, 2.0, windowStart, true));
 
     StatsByTimeWindow expected;
-    expected[windowStart]["BTCUSDT"] = makeStats(1, 100.0, 100.0, 100.0, 1, 0);
-    expected[windowStart]["ETHUSDT"] = makeStats(1, 100.0, 50.0, 50.0, 0, 1);
+    expected[windowStart]["BTCUSDT"] = WindowStats(1, 100.0, 100.0, 100.0, 1, 0);
+    expected[windowStart]["ETHUSDT"] = WindowStats(1, 100.0, 50.0, 50.0, 0, 1);
 
     auto actual = agg.extractClosedWindows(windowStart + windowMs);
 
@@ -164,7 +152,7 @@ TEST(AggregatorTest, ExtractedWindowsAreRemovedFromStore) {
     agg.processTrade(makeTrade("BTCUSDT", 100.0, 1.0, windowStart, false));
 
     StatsByTimeWindow expectedFirst;
-    expectedFirst[windowStart]["BTCUSDT"] = makeStats(1, 100.0, 100.0, 100.0, 1, 0);
+    expectedFirst[windowStart]["BTCUSDT"] = WindowStats(1, 100.0, 100.0, 100.0, 1, 0);
     auto actualFirst = agg.extractClosedWindows(windowStart + windowMs);
     expectWindowsEqual(expectedFirst, actualFirst);
 
@@ -182,7 +170,7 @@ TEST(AggregatorTest, TradeExactlyOnWindowBoundaryGoesToNewWindow) {
     agg.processTrade(makeTrade("BTCUSDT", 100.0, 1.0, boundaryTime, false));
 
     StatsByTimeWindow expected;
-    expected[boundaryTime]["BTCUSDT"] = makeStats(1, 100.0, 100.0, 100.0, 1, 0);
+    expected[boundaryTime]["BTCUSDT"] = WindowStats(1, 100.0, 100.0, 100.0, 1, 0);
 
     auto actual = agg.extractClosedWindows(boundaryTime + windowMs);
 
@@ -200,7 +188,7 @@ TEST(AggregatorTest, OnlyFullyClosedWindowsAreExtractedWhenMixed) {
     agg.processTrade(makeTrade("BTCUSDT", 200.0, 1.0, secondWindowStart + 200, false));
 
     StatsByTimeWindow expected;
-    expected[firstWindowStart]["BTCUSDT"] = makeStats(1, 100.0, 100.0, 100.0, 1, 0);
+    expected[firstWindowStart]["BTCUSDT"] = WindowStats(1, 100.0, 100.0, 100.0, 1, 0);
 
     auto actual = agg.extractClosedWindows(firstWindowStart + windowMs);
 

@@ -15,5 +15,16 @@ struct WindowStats {
     uint64_t buyCount = 0;
     uint64_t sellCount = 0;
 
+    WindowStats() = default;
+
+    WindowStats(uint64_t tradesNum, double volume, double minPrice, double maxPrice,
+                uint64_t buyCount, uint64_t sellCount)
+        : tradesNum(tradesNum),
+          volume(volume),
+          minPrice(minPrice),
+          maxPrice(maxPrice),
+          buyCount(buyCount),
+          sellCount(sellCount) {}
+
     void update(const Trade &trade);
 };
