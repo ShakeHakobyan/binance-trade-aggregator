@@ -1,0 +1,255 @@
+timestamp=2026-07-12T20:54:19Z
+symbol=BTCUSDT trades=1 volume=168.23 min=64210 max=64210 buy=1 sell=0
+symbol=ETHUSDT trades=14 volume=154.32 min=1821.94 max=1822.01 buy=14 sell=0
+timestamp=2026-07-12T20:54:20Z
+symbol=BNBUSDT trades=3 volume=17.9555 min=579.21 max=579.21 buy=0 sell=3
+symbol=BTCUSDT trades=2 volume=60.3574 min=64210 max=64210 buy=2 sell=0
+symbol=ETHUSDT trades=7 volume=36.076 min=1822.02 max=1822.02 buy=7 sell=0
+timestamp=2026-07-12T20:54:21Z
+symbol=ETHUSDT trades=18 volume=207.351 min=1822.03 max=1822.11 buy=18 sell=0
+timestamp=2026-07-12T20:54:22Z
+symbol=BTCUSDT trades=2 volume=270.966 min=64210 max=64210 buy=0 sell=2
+timestamp=2026-07-12T20:54:23Z
+symbol=BNBUSDT trades=1 volume=57.922 min=579.22 max=579.22 buy=1 sell=0
+symbol=BTCUSDT trades=2 volume=55.8627 min=64210 max=64210 buy=2 sell=0
+timestamp=2026-07-12T20:54:24Z
+symbol=ETHUSDT trades=4 volume=63.5916 min=1822.1 max=1822.11 buy=3 sell=1
+timestamp=2026-07-12T20:54:25Z
+symbol=BTCUSDT trades=4 volume=229.872 min=64210 max=64210 buy=2 sell=2
+timestamp=2026-07-12T20:54:26Z
+symbol=BNBUSDT trades=45 volume=4179.66 min=579.22 max=579.27 buy=45 sell=0
+symbol=BTCUSDT trades=3 volume=1792.1 min=64210 max=64210 buy=2 sell=1
+symbol=ETHUSDT trades=37 volume=1720.31 min=1822.11 max=1822.27 buy=37 sell=0
+timestamp=2026-07-12T20:54:27Z
+symbol=BNBUSDT trades=3 volume=31.8604 min=579.28 max=579.28 buy=3 sell=0
+symbol=ETHUSDT trades=1 volume=172.57 min=1822.28 max=1822.28 buy=1 sell=0
+timestamp=2026-07-12T20:54:28Z
+symbol=BTCUSDT trades=1 volume=231.798 min=64210 max=64210 buy=0 sell=1
+symbol=ETHUSDT trades=1 volume=93.8474 min=1822.28 max=1822.28 buy=1 sell=0
+timestamp=2026-07-12T20:54:29Z
+symbol=BTCUSDT trades=2 volume=1410.05 min=64210 max=64210 buy=1 sell=1
+timestamp=2026-07-12T20:54:30Z
+symbol=BNBUSDT trades=2 volume=7.53064 min=579.28 max=579.28 buy=2 sell=0
+symbol=BTCUSDT trades=1 volume=10.2736 min=64210 max=64210 buy=0 sell=1
+timestamp=2026-07-12T20:54:31Z
+symbol=BNBUSDT trades=6 volume=31.8604 min=579.28 max=579.28 buy=6 sell=0
+symbol=BTCUSDT trades=3 volume=1761.28 min=64210 max=64210 buy=0 sell=3
+symbol=ETHUSDT trades=1 volume=9.84031 min=1822.28 max=1822.28 buy=1 sell=0
+timestamp=2026-07-12T20:54:32Z
+symbol=BNBUSDT trades=1 volume=830.108 min=579.28 max=579.28 buy=0 sell=1
+symbol=BTCUSDT trades=2 volume=2486.85 min=64210 max=64210 buy=1 sell=1
+symbol=ETHUSDT trades=1 volume=225.597 min=1822.27 max=1822.27 buy=0 sell=1
+timestamp=2026-07-12T20:54:34Z
+symbol=BNBUSDT trades=1 volume=39.971 min=579.29 max=579.29 buy=1 sell=0
+symbol=BTCUSDT trades=2 volume=159.241 min=64210 max=64210 buy=0 sell=2
+timestamp=2026-07-12T20:54:35Z
+symbol=BNBUSDT trades=1 volume=81.0992 min=579.28 max=579.28 buy=0 sell=1
+timestamp=2026-07-12T20:54:36Z
+symbol=BTCUSDT trades=2 volume=172.083 min=64210 max=64210 buy=0 sell=2
+timestamp=2026-07-12T20:54:37Z
+symbol=BNBUSDT trades=2 volume=17.9579 min=579.28 max=579.29 buy=1 sell=1
+symbol=BTCUSDT trades=2 volume=262.619 min=64210 max=64210 buy=0 sell=2
+symbol=ETHUSDT trades=35 volume=1838.45 min=1822.16 max=1822.27 buy=0 sell=35
+timestamp=2026-07-12T20:54:38Z
+symbol=BTCUSDT trades=1 volume=12.1999 min=64210 max=64210 buy=0 sell=1
+symbol=ETHUSDT trades=5 volume=1772.04 min=1822.15 max=1822.15 buy=0 sell=5
+timestamp=2026-07-12T20:54:39Z
+symbol=BNBUSDT trades=1 volume=167.991 min=579.28 max=579.28 buy=0 sell=1
+symbol=BTCUSDT trades=1 volume=60.3574 min=64210 max=64210 buy=0 sell=1
+timestamp=2026-07-12T20:54:40Z
+symbol=BNBUSDT trades=1 volume=32.4397 min=579.28 max=579.28 buy=0 sell=1
+symbol=BTCUSDT trades=1 volume=114.294 min=64210 max=64210 buy=0 sell=1
+symbol=ETHUSDT trades=45 volume=2614.57 min=1822.05 max=1822.16 buy=2 sell=43
+timestamp=2026-07-12T20:54:42Z
+symbol=BTCUSDT trades=2 volume=256.198 min=64210 max=64210 buy=1 sell=1
+timestamp=2026-07-12T20:54:43Z
+symbol=BTCUSDT trades=2 volume=455.891 min=64210 max=64210 buy=0 sell=2
+symbol=ETHUSDT trades=1 volume=5.46612 min=1822.04 max=1822.04 buy=0 sell=1
+timestamp=2026-07-12T20:54:44Z
+symbol=BTCUSDT trades=2 volume=141.262 min=64210 max=64210 buy=2 sell=0
+timestamp=2026-07-12T20:54:45Z
+symbol=BNBUSDT trades=2 volume=483.707 min=579.29 max=579.29 buy=2 sell=0
+symbol=BTCUSDT trades=4 volume=236.293 min=64210 max=64210 buy=2 sell=2
+symbol=ETHUSDT trades=8 volume=256.361 min=1822.04 max=1822.05 buy=1 sell=7
+timestamp=2026-07-12T20:54:46Z
+symbol=BTCUSDT trades=1 volume=199.693 min=64210 max=64210 buy=1 sell=0
+timestamp=2026-07-12T20:54:47Z
+symbol=BTCUSDT trades=1 volume=231.798 min=64210 max=64210 buy=0 sell=1
+symbol=ETHUSDT trades=4 volume=111.874 min=1822.04 max=1822.05 buy=1 sell=3
+timestamp=2026-07-12T20:54:48Z
+symbol=BTCUSDT trades=1 volume=620.269 min=64210 max=64210 buy=0 sell=1
+timestamp=2026-07-12T20:54:49Z
+symbol=BTCUSDT trades=14 volume=1715.69 min=64210 max=64210 buy=0 sell=14
+symbol=ETHUSDT trades=3 volume=242.879 min=1822.04 max=1822.05 buy=1 sell=2
+timestamp=2026-07-12T20:54:50Z
+symbol=BNBUSDT trades=1 volume=17.9577 min=579.28 max=579.28 buy=0 sell=1
+symbol=ETHUSDT trades=1 volume=29.8816 min=1822.05 max=1822.05 buy=1 sell=0
+timestamp=2026-07-12T20:54:51Z
+symbol=BTCUSDT trades=5 volume=4981.41 min=64210 max=64210 buy=0 sell=5
+timestamp=2026-07-12T20:54:52Z
+symbol=BNBUSDT trades=2 volume=51.5562 min=579.28 max=579.29 buy=1 sell=1
+symbol=BTCUSDT trades=3 volume=260.051 min=64210 max=64210 buy=1 sell=2
+timestamp=2026-07-12T20:54:53Z
+symbol=BNBUSDT trades=1 volume=12.1649 min=579.28 max=579.28 buy=0 sell=1
+symbol=ETHUSDT trades=2 volume=1098.69 min=1822.04 max=1822.05 buy=1 sell=1
+timestamp=2026-07-12T20:54:55Z
+symbol=BNBUSDT trades=1 volume=5.7928 min=579.28 max=579.28 buy=0 sell=1
+timestamp=2026-07-12T20:54:56Z
+symbol=BNBUSDT trades=1 volume=347.568 min=579.28 max=579.28 buy=0 sell=1
+symbol=ETHUSDT trades=1 volume=129.366 min=1822.05 max=1822.05 buy=1 sell=0
+timestamp=2026-07-12T20:54:57Z
+symbol=BTCUSDT trades=1 volume=297.935 min=64210 max=64210 buy=0 sell=1
+timestamp=2026-07-12T20:54:58Z
+symbol=BTCUSDT trades=2 volume=372.418 min=64210 max=64210 buy=0 sell=2
+symbol=ETHUSDT trades=150 volume=8992.13 min=1821.98 max=1822.04 buy=0 sell=150
+timestamp=2026-07-12T20:54:59Z
+symbol=BNBUSDT trades=1 volume=59.6669 min=579.29 max=579.29 buy=1 sell=0
+symbol=BTCUSDT trades=1 volume=190.704 min=64210 max=64210 buy=1 sell=0
+symbol=ETHUSDT trades=30 volume=2098.55 min=1821.94 max=1821.98 buy=1 sell=29
+timestamp=2026-07-12T20:55:00Z
+symbol=BNBUSDT trades=51 volume=2511.14 min=579.25 max=579.28 buy=0 sell=51
+symbol=BTCUSDT trades=446 volume=50800.4 min=64199.2 max=64210 buy=0 sell=446
+symbol=ETHUSDT trades=125 volume=31168.9 min=1821.59 max=1821.93 buy=0 sell=125
+timestamp=2026-07-12T20:55:01Z
+symbol=BTCUSDT trades=1 volume=6.41992 min=64199.2 max=64199.2 buy=0 sell=1
+timestamp=2026-07-12T20:55:02Z
+symbol=BTCUSDT trades=1 volume=231.759 min=64199.2 max=64199.2 buy=0 sell=1
+timestamp=2026-07-12T20:55:03Z
+symbol=BNBUSDT trades=33 volume=1187.43 min=579.17 max=579.24 buy=0 sell=33
+symbol=BTCUSDT trades=90 volume=73514.5 min=64196.1 max=64199.2 buy=0 sell=90
+symbol=ETHUSDT trades=34 volume=815.338 min=1821.47 max=1821.59 buy=0 sell=34
+timestamp=2026-07-12T20:55:04Z
+symbol=BNBUSDT trades=3 volume=579.16 min=579.16 max=579.16 buy=0 sell=3
+symbol=BTCUSDT trades=2 volume=16.691 min=64196.1 max=64196.1 buy=2 sell=0
+symbol=ETHUSDT trades=2 volume=5.8287 min=1821.47 max=1821.47 buy=0 sell=2
+timestamp=2026-07-12T20:55:05Z
+symbol=BNBUSDT trades=20 volume=569.887 min=579.11 max=579.16 buy=0 sell=20
+symbol=BTCUSDT trades=5 volume=26.3204 min=64196.1 max=64196.1 buy=0 sell=5
+symbol=ETHUSDT trades=3 volume=1285.96 min=1821.47 max=1821.47 buy=0 sell=3
+timestamp=2026-07-12T20:55:06Z
+symbol=BTCUSDT trades=11 volume=1679.37 min=64196.1 max=64196.1 buy=0 sell=11
+symbol=ETHUSDT trades=2 volume=230.053 min=1821.48 max=1821.48 buy=2 sell=0
+timestamp=2026-07-12T20:55:07Z
+symbol=BTCUSDT trades=1 volume=231.748 min=64196.1 max=64196.1 buy=0 sell=1
+symbol=ETHUSDT trades=29 volume=1159.19 min=1821.48 max=1821.58 buy=29 sell=0
+timestamp=2026-07-12T20:55:10Z
+symbol=BNBUSDT trades=1 volume=1177.91 min=579.11 max=579.11 buy=1 sell=0
+symbol=BTCUSDT trades=124 volume=7927.57 min=64195 max=64196.1 buy=0 sell=124
+symbol=ETHUSDT trades=5 volume=1827.05 min=1821.58 max=1821.59 buy=3 sell=2
+timestamp=2026-07-12T20:55:11Z
+symbol=ETHUSDT trades=10 volume=107.473 min=1821.58 max=1821.58 buy=0 sell=10
+timestamp=2026-07-12T20:55:12Z
+symbol=BTCUSDT trades=1 volume=231.744 min=64195 max=64195 buy=0 sell=1
+timestamp=2026-07-12T20:55:13Z
+symbol=BNBUSDT trades=1 volume=57.3319 min=579.11 max=579.11 buy=1 sell=0
+symbol=ETHUSDT trades=1 volume=5.28258 min=1821.58 max=1821.58 buy=0 sell=1
+timestamp=2026-07-12T20:55:14Z
+symbol=BTCUSDT trades=1 volume=63.553 min=64195 max=64195 buy=0 sell=1
+timestamp=2026-07-12T20:55:15Z
+symbol=BNBUSDT trades=10 volume=54.4348 min=579.08 max=579.1 buy=0 sell=10
+symbol=BTCUSDT trades=67 volume=26874.6 min=64192.9 max=64195 buy=0 sell=67
+symbol=ETHUSDT trades=4 volume=127.511 min=1821.59 max=1821.59 buy=4 sell=0
+timestamp=2026-07-12T20:55:16Z
+symbol=BNBUSDT trades=74 volume=5427.59 min=578.96 max=579.07 buy=0 sell=74
+symbol=BTCUSDT trades=9 volume=571.959 min=64192.9 max=64192.9 buy=0 sell=9
+symbol=ETHUSDT trades=1 volume=31.8777 min=1821.58 max=1821.58 buy=0 sell=1
+timestamp=2026-07-12T20:55:17Z
+symbol=BTCUSDT trades=2 volume=1318.52 min=64192.9 max=64192.9 buy=0 sell=2
+timestamp=2026-07-12T20:55:18Z
+symbol=BNBUSDT trades=2 volume=27.2111 min=578.96 max=578.96 buy=2 sell=0
+symbol=BTCUSDT trades=5 volume=1240.21 min=64192.9 max=64192.9 buy=0 sell=5
+symbol=ETHUSDT trades=7 volume=640.835 min=1821.58 max=1821.59 buy=1 sell=6
+timestamp=2026-07-12T20:55:19Z
+symbol=BNBUSDT trades=3 volume=2077.85 min=578.95 max=578.95 buy=0 sell=3
+symbol=BTCUSDT trades=1 volume=9.62894 min=64192.9 max=64192.9 buy=0 sell=1
+symbol=ETHUSDT trades=1 volume=999.871 min=1821.59 max=1821.59 buy=1 sell=0
+timestamp=2026-07-12T20:55:20Z
+symbol=BNBUSDT trades=3 volume=50.9482 min=578.95 max=578.96 buy=1 sell=2
+timestamp=2026-07-12T20:55:21Z
+symbol=BTCUSDT trades=2 volume=71.2542 min=64192.9 max=64192.9 buy=2 sell=0
+timestamp=2026-07-12T20:55:22Z
+symbol=BTCUSDT trades=1 volume=19.2579 min=64192.9 max=64192.9 buy=1 sell=0
+timestamp=2026-07-12T20:55:23Z
+symbol=BTCUSDT trades=19 volume=16652.9 min=64192.9 max=64192.9 buy=0 sell=19
+symbol=ETHUSDT trades=1 volume=20.9483 min=1821.59 max=1821.59 buy=1 sell=0
+timestamp=2026-07-12T20:55:24Z
+symbol=BNBUSDT trades=1 volume=555.802 min=578.96 max=578.96 buy=1 sell=0
+symbol=BTCUSDT trades=3 volume=1735.78 min=64192.9 max=64192.9 buy=0 sell=3
+timestamp=2026-07-12T20:55:25Z
+symbol=BNBUSDT trades=2 volume=39.3693 min=578.96 max=578.96 buy=2 sell=0
+symbol=BTCUSDT trades=1 volume=22.4675 min=64192.9 max=64192.9 buy=0 sell=1
+symbol=ETHUSDT trades=1 volume=71.7706 min=1821.59 max=1821.59 buy=1 sell=0
+timestamp=2026-07-12T20:55:26Z
+symbol=ETHUSDT trades=3 volume=71.7703 min=1821.58 max=1821.58 buy=0 sell=3
+timestamp=2026-07-12T20:55:27Z
+symbol=ETHUSDT trades=1 volume=71.042 min=1821.59 max=1821.59 buy=1 sell=0
+timestamp=2026-07-12T20:55:28Z
+symbol=BNBUSDT trades=1 volume=22.0005 min=578.96 max=578.96 buy=1 sell=0
+symbol=BTCUSDT trades=24 volume=5232.37 min=64192.9 max=64192.9 buy=0 sell=24
+symbol=ETHUSDT trades=1 volume=71.0416 min=1821.58 max=1821.58 buy=0 sell=1
+timestamp=2026-07-12T20:55:29Z
+symbol=ETHUSDT trades=1 volume=71.7706 min=1821.59 max=1821.59 buy=1 sell=0
+timestamp=2026-07-12T20:55:30Z
+symbol=BNBUSDT trades=22 volume=9939.01 min=578.96 max=578.96 buy=22 sell=0
+symbol=BTCUSDT trades=1 volume=100.141 min=64192.9 max=64192.9 buy=0 sell=1
+symbol=ETHUSDT trades=1 volume=71.7703 min=1821.58 max=1821.58 buy=0 sell=1
+timestamp=2026-07-12T20:55:31Z
+symbol=BNBUSDT trades=7 volume=99.5828 min=578.97 max=578.97 buy=7 sell=0
+timestamp=2026-07-12T20:55:32Z
+symbol=BNBUSDT trades=1 volume=34.7376 min=578.96 max=578.96 buy=0 sell=1
+symbol=BTCUSDT trades=2 volume=247.785 min=64192.9 max=64192.9 buy=0 sell=2
+timestamp=2026-07-12T20:55:33Z
+symbol=BNBUSDT trades=2 volume=578.96 min=578.96 max=578.96 buy=0 sell=2
+timestamp=2026-07-12T20:55:35Z
+symbol=BTCUSDT trades=1 volume=536.011 min=64192.9 max=64192.9 buy=0 sell=1
+timestamp=2026-07-12T20:55:36Z
+symbol=BTCUSDT trades=5 volume=1997.68 min=64192.9 max=64192.9 buy=2 sell=3
+timestamp=2026-07-12T20:55:37Z
+symbol=BNBUSDT trades=1 volume=9.84249 min=578.97 max=578.97 buy=1 sell=0
+symbol=BTCUSDT trades=2 volume=636.152 min=64192.9 max=64192.9 buy=0 sell=2
+timestamp=2026-07-12T20:55:39Z
+symbol=BNBUSDT trades=1 volume=5.21073 min=578.97 max=578.97 buy=1 sell=0
+symbol=BTCUSDT trades=1 volume=1485.42 min=64192.9 max=64192.9 buy=1 sell=0
+timestamp=2026-07-12T20:55:40Z
+symbol=BNBUSDT trades=1 volume=53.2652 min=578.97 max=578.97 buy=1 sell=0
+symbol=BTCUSDT trades=1 volume=301.707 min=64192.9 max=64192.9 buy=0 sell=1
+timestamp=2026-07-12T20:55:42Z
+symbol=BTCUSDT trades=1 volume=231.737 min=64192.9 max=64192.9 buy=0 sell=1
+symbol=ETHUSDT trades=2 volume=58.6552 min=1821.59 max=1821.59 buy=2 sell=0
+timestamp=2026-07-12T20:55:43Z
+symbol=BTCUSDT trades=1 volume=4.49351 min=64192.9 max=64192.9 buy=1 sell=0
+symbol=ETHUSDT trades=1 volume=38.7997 min=1821.58 max=1821.58 buy=0 sell=1
+timestamp=2026-07-12T20:55:44Z
+symbol=BTCUSDT trades=1 volume=942.352 min=64192.9 max=64192.9 buy=0 sell=1
+timestamp=2026-07-12T20:55:45Z
+symbol=BNBUSDT trades=2 volume=20.8429 min=578.97 max=578.97 buy=2 sell=0
+symbol=BTCUSDT trades=1 volume=53.2801 min=64192.9 max=64192.9 buy=0 sell=1
+symbol=ETHUSDT trades=1 volume=5.46474 min=1821.58 max=1821.58 buy=0 sell=1
+timestamp=2026-07-12T20:55:46Z
+symbol=BTCUSDT trades=2 volume=5668.88 min=64192.9 max=64192.9 buy=1 sell=1
+timestamp=2026-07-12T20:55:47Z
+symbol=BTCUSDT trades=3 volume=865.963 min=64192.9 max=64192.9 buy=1 sell=2
+timestamp=2026-07-12T20:55:48Z
+symbol=BNBUSDT trades=1 volume=27.7906 min=578.97 max=578.97 buy=1 sell=0
+symbol=BTCUSDT trades=1 volume=39.7996 min=64192.9 max=64192.9 buy=0 sell=1
+timestamp=2026-07-12T20:55:49Z
+symbol=BNBUSDT trades=1 volume=10.4215 min=578.97 max=578.97 buy=1 sell=0
+symbol=BTCUSDT trades=1 volume=10.2709 min=64192.9 max=64192.9 buy=1 sell=0
+timestamp=2026-07-12T20:55:50Z
+symbol=BNBUSDT trades=3 volume=57.3172 min=578.96 max=578.97 buy=1 sell=2
+symbol=BTCUSDT trades=2 volume=905.12 min=64192.9 max=64192.9 buy=1 sell=1
+symbol=ETHUSDT trades=1 volume=20.0375 min=1821.59 max=1821.59 buy=1 sell=0
+timestamp=2026-07-12T20:55:51Z
+symbol=BNBUSDT trades=1 volume=63.6856 min=578.96 max=578.96 buy=0 sell=1
+symbol=BTCUSDT trades=3 volume=528.95 min=64192.9 max=64192.9 buy=2 sell=1
+timestamp=2026-07-12T20:55:52Z
+symbol=BTCUSDT trades=1 volume=21.8256 min=64192.9 max=64192.9 buy=0 sell=1
+timestamp=2026-07-12T20:55:53Z
+symbol=BTCUSDT trades=2 volume=295.288 min=64192.9 max=64192.9 buy=0 sell=2
+symbol=ETHUSDT trades=1 volume=26.2308 min=1821.58 max=1821.58 buy=0 sell=1
+timestamp=2026-07-12T20:55:54Z
+symbol=BTCUSDT trades=2 volume=525.74 min=64192.9 max=64192.9 buy=0 sell=2
+symbol=ETHUSDT trades=1 volume=13.2976 min=1821.59 max=1821.59 buy=1 sell=0
+timestamp=2026-07-12T20:55:55Z
+symbol=BNBUSDT trades=1 volume=1073.41 min=578.97 max=578.97 buy=1 sell=0
+symbol=ETHUSDT trades=2 volume=199.828 min=1821.59 max=1821.59 buy=2 sell=0

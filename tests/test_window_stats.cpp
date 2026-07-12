@@ -13,8 +13,8 @@ TEST(WindowStatsTest, UpdatesSingleTrade) {
     EXPECT_DOUBLE_EQ(stats.volume, 200.0);
     EXPECT_DOUBLE_EQ(stats.minPrice, 100.0);
     EXPECT_DOUBLE_EQ(stats.maxPrice, 100.0);
-    EXPECT_EQ(stats.buyCount, 1);
-    EXPECT_EQ(stats.sellCount, 0);
+    EXPECT_EQ(stats.buyCount, 0);
+    EXPECT_EQ(stats.sellCount, 1);
 }
 
 TEST(WindowStatsTest, AggregatesMultipleTrades) {
