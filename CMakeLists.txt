@@ -34,12 +34,14 @@ find_package(GTest REQUIRED CONFIG)
 
 add_executable(unit_tests
     tests/test_aggregator.cpp
+    tests/test_binance_client.cpp
     tests/test_config.cpp
     tests/test_file_writer.cpp
     tests/test_json_trade_parser.cpp
     tests/test_trade_queue.cpp
     tests/test_window_stats.cpp
     src/aggregator.cpp
+    src/binance_client.cpp
     src/config.cpp
     src/file_writer.cpp
     src/json_trade_parser.cpp
@@ -53,6 +55,9 @@ target_link_libraries(unit_tests
     PRIVATE
     GTest::gtest
     GTest::gtest_main
+    Boost::boost
+    OpenSSL::SSL
+    OpenSSL::Crypto
     nlohmann_json::nlohmann_json
 )
 
