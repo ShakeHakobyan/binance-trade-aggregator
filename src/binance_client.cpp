@@ -27,7 +27,7 @@ const std::string kTarget = "/stream";
 
 } // namespace
 
-BinanceClient::BinanceClient(std::vector<std::string> pairs, TradeQueue &queue)
+BinanceClient::BinanceClient(std::vector<std::string> pairs, TradeQueue& queue)
     : pairs_(std::move(pairs)), queue_(queue) {
 }
 
@@ -40,7 +40,7 @@ void BinanceClient::run() {
             connectAndListen();
 
             backoffSeconds = 1;
-        } catch (const std::exception &e) {
+        } catch (const std::exception& e) {
             std::cerr << "[BinanceClient] " << e.what() << ". Reconnecting in " << backoffSeconds
                       << "s\n";
 
@@ -50,12 +50,12 @@ void BinanceClient::run() {
     }
 }
 
-void BinanceClient::connect(WebSocket &ws, tcp::resolver &resolver) {
+void BinanceClient::connect(WebSocket& ws, tcp::resolver& resolver) {
     auto results = resolver.resolve(kHost, kPort);
     net::connect(beast::get_lowest_layer(ws), results);
 }
 
-void BinanceClient::handshake(WebSocket &ws) {
+void BinanceClient::handshake(WebSocket& ws) {
     if (!SSL_set_tlsext_host_name(ws.next_layer().native_handle(), kHost.c_str())) {
         throw beast::system_error(
             beast::error_code(static_cast<int>(::ERR_get_error()), net::error::get_ssl_category()));
@@ -67,7 +67,7 @@ void BinanceClient::handshake(WebSocket &ws) {
     std::cout << "[BinanceClient] Connected\n";
 }
 
-void BinanceClient::setupControl(WebSocket &ws) {
+void BinanceClient::setupControl(WebSocket& ws) {
     ws.control_callback([](websocket::frame_type type, beast::string_view) {
         if (type == websocket::frame_type::ping) {
             std::cout << "[BinanceClient] ping\n";
@@ -75,7 +75,7 @@ void BinanceClient::setupControl(WebSocket &ws) {
     });
 }
 
-void BinanceClient::subscribe(WebSocket &ws) {
+void BinanceClient::subscribe(WebSocket& ws) {
     json msg = {{"method", "SUBSCRIBE"}, {"params", pairs_}, {"id", 1}};
     std::string request = msg.dump();
     ws.write(net::buffer(request));
@@ -83,7 +83,7 @@ void BinanceClient::subscribe(WebSocket &ws) {
     std::cout << "[BinanceClient] subscribed\n";
 }
 
-void BinanceClient::readLoop(WebSocket &ws) {
+void BinanceClient::readLoop(WebSocket& ws) {
     while (true) {
         beast::flat_buffer buffer;
         ws.read(buffer);

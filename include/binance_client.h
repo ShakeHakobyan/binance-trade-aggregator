@@ -15,18 +15,18 @@ using WebSocket = boost::beast::websocket::stream<boost::beast::ssl_stream<tcp::
 
 class BinanceClient {
   public:
-    BinanceClient(std::vector<std::string> pairs, TradeQueue &queue);
+    BinanceClient(std::vector<std::string> pairs, TradeQueue& queue);
 
     void run();
 
   private:
-    void connect(WebSocket &ws, tcp::resolver &resolver);
-    void handshake(WebSocket &ws);
-    void setupControl(WebSocket &ws);
-    void subscribe(WebSocket &ws);
-    void readLoop(WebSocket &ws);
+    void connect(WebSocket& ws, tcp::resolver& resolver);
+    void handshake(WebSocket& ws);
+    void setupControl(WebSocket& ws);
+    void subscribe(WebSocket& ws);
+    void readLoop(WebSocket& ws);
     void connectAndListen();
 
     std::vector<std::string> pairs_;
-    TradeQueue &queue_;
+    TradeQueue& queue_;
 };

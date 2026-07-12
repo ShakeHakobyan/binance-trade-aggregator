@@ -1,8 +1,8 @@
 #include "file_writer.h"
-#include <gtest/gtest.h>
-#include <fstream>
-#include <sstream>
 #include <cstdio>
+#include <fstream>
+#include <gtest/gtest.h>
+#include <sstream>
 
 namespace {
 

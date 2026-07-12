@@ -7,7 +7,7 @@
 
 class TradeQueue {
   public:
-    void push(const Trade &trade);
+    void push(const Trade& trade);
     Trade pop();
 
   private:

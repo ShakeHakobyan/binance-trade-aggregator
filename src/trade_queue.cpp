@@ -1,6 +1,6 @@
 #include "trade_queue.h"
 
-void TradeQueue::push(const Trade &trade) {
+void TradeQueue::push(const Trade& trade) {
     std::lock_guard<std::mutex> lock(mutex_);
     queue_.push(trade);
     cv_.notify_one();

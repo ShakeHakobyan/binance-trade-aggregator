@@ -10,11 +10,11 @@ class FileWriter {
   public:
     explicit FileWriter(std::string outputPath);
 
-    bool write(const StatsByTimeWindow &closedWindows);
+    bool write(const StatsByTimeWindow& closedWindows);
 
   private:
     static std::string formatTimestamp(int64_t windowStartMs);
-    static std::string formatSymbolLine(const std::string &symbol, const WindowStats &stats);
+    static std::string formatSymbolLine(const std::string& symbol, const WindowStats& stats);
 
     std::string outputPath_;
 };

@@ -1,7 +1,7 @@
 #include "config.h"
-#include <gtest/gtest.h>
-#include <fstream>
 #include <cstdio>
+#include <fstream>
+#include <gtest/gtest.h>
 
 namespace {
 
@@ -20,7 +20,8 @@ TEST(ConfigTest, LoadsValidConfig) {
         "aggregation_window_ms": 500,
         "serialization_interval_ms": 2000,
         "output_file_path": "custom_output.txt"
-    })", path);
+    })",
+                    path);
 
     Config config = Config::loadFromFile(path);
 
@@ -39,7 +40,8 @@ TEST(ConfigTest, UsesDefaultOutputPathIfMissing) {
         "pairs": ["btcusdt@trade"],
         "aggregation_window_ms": 1000,
         "serialization_interval_ms": 1000
-    })", path);
+    })",
+                    path);
 
     Config config = Config::loadFromFile(path);
 
@@ -57,7 +59,8 @@ TEST(ConfigTest, ThrowsOnEmptyPairs) {
         "pairs": [],
         "aggregation_window_ms": 1000,
         "serialization_interval_ms": 1000
-    })", path);
+    })",
+                    path);
 
     EXPECT_THROW(Config::loadFromFile(path), std::runtime_error);
     std::remove(path.c_str());
@@ -69,7 +72,8 @@ TEST(ConfigTest, ThrowsOnNonPositiveInterval) {
         "pairs": ["btcusdt@trade"],
         "aggregation_window_ms": 0,
         "serialization_interval_ms": 1000
-    })", path);
+    })",
+                    path);
 
     EXPECT_THROW(Config::loadFromFile(path), std::runtime_error);
     std::remove(path.c_str());

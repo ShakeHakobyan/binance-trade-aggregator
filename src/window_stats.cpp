@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-void WindowStats::update(const Trade &trade) {
+void WindowStats::update(const Trade& trade) {
     ++tradesNum;
 
     volume += trade.quantity * trade.price;

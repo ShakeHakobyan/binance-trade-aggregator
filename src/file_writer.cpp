@@ -20,7 +20,7 @@ std::string FileWriter::formatTimestamp(int64_t windowStartMs) {
     return oss.str();
 }
 
-std::string FileWriter::formatSymbolLine(const std::string &symbol, const WindowStats &stats) {
+std::string FileWriter::formatSymbolLine(const std::string& symbol, const WindowStats& stats) {
     std::ostringstream oss;
     oss << "symbol=" << symbol << " trades=" << stats.tradesNum << " volume=" << stats.volume
         << " min=" << stats.minPrice << " max=" << stats.maxPrice << " buy=" << stats.buyCount
@@ -28,7 +28,7 @@ std::string FileWriter::formatSymbolLine(const std::string &symbol, const Window
     return oss.str();
 }
 
-bool FileWriter::write(const StatsByTimeWindow &closedWindows) {
+bool FileWriter::write(const StatsByTimeWindow& closedWindows) {
     if (closedWindows.empty()) {
         return true;
     }
@@ -39,15 +39,15 @@ bool FileWriter::write(const StatsByTimeWindow &closedWindows) {
         return false;
     }
 
-    for (const auto &windowEntry : closedWindows) {
+    for (const auto& windowEntry : closedWindows) {
         int64_t windowStart = windowEntry.first;
 
         std::map<std::string, WindowStats> sortedSymbols(windowEntry.second.begin(),
                                                          windowEntry.second.end());
 
         bool wroteTimestamp = false;
-        for (const auto &symbolEntry : sortedSymbols) {
-            const WindowStats &stats = symbolEntry.second;
+        for (const auto& symbolEntry : sortedSymbols) {
+            const WindowStats& stats = symbolEntry.second;
             if (stats.tradesNum == 0) {
                 continue;
             }

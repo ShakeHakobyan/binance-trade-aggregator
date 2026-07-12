@@ -4,7 +4,7 @@
 
 namespace {
 
-Trade makeTrade(const std::string &symbol, double price, double qty, int64_t timeMs,
+Trade makeTrade(const std::string& symbol, double price, double qty, int64_t timeMs,
                 bool isBuyerMaker) {
     Trade t;
     t.symbol = symbol;
@@ -15,19 +15,19 @@ Trade makeTrade(const std::string &symbol, double price, double qty, int64_t tim
     return t;
 }
 
-void expectWindowsEqual(const StatsByTimeWindow &expected, const StatsByTimeWindow &actual) {
+void expectWindowsEqual(const StatsByTimeWindow& expected, const StatsByTimeWindow& actual) {
     ASSERT_EQ(expected.size(), actual.size());
 
-    for (const auto &[windowStart, expectedSymbols] : expected) {
+    for (const auto& [windowStart, expectedSymbols] : expected) {
         ASSERT_TRUE(actual.count(windowStart) > 0) << "Missing window: " << windowStart;
 
-        const auto &actualSymbols = actual.at(windowStart);
+        const auto& actualSymbols = actual.at(windowStart);
         ASSERT_EQ(expectedSymbols.size(), actualSymbols.size()) << "Window: " << windowStart;
 
-        for (const auto &[symbol, expectedStats] : expectedSymbols) {
+        for (const auto& [symbol, expectedStats] : expectedSymbols) {
             ASSERT_TRUE(actualSymbols.count(symbol) > 0) << symbol << "@" << windowStart;
 
-            const WindowStats &actualStats = actualSymbols.at(symbol);
+            const WindowStats& actualStats = actualSymbols.at(symbol);
 
             EXPECT_EQ(expectedStats.tradesNum, actualStats.tradesNum)
                 << symbol << "@" << windowStart;
