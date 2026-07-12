@@ -44,11 +44,11 @@ cmake --build .
 
 - `Aggregator::stop()` closes `TradeQueue`, waking the blocked `pop()`
   inside `run()` (`pop()` returns `nullopt`, loop exits).
-- `BinanceClient::stop()` sets an atomic flag; the read loop uses a
-  socket-level timeout (`SO_RCVTIMEO`, 2s) instead of an unbounded
-  blocking read, so it wakes up periodically and rechecks the flag
-  (cross-thread socket shutdown during a blocking read is not reliably
-  safe, so this was avoided).
+- `BinanceClient` — the pure, network-independent pieces: `buildSubscribeMessage()`
+  (message format, including single-pair and empty-list edge cases) and
+  `nextBackoffSeconds()` (backoff progression and cap). Socket-level logic
+  (`connect`, `handshake`, `readLoop`) performs real network I/O and is
+  verified manually, not by unit tests (see below).
 - `main()` calls both `stop()`s, joins the threads, then does one final
   `extractClosedWindows()` + `write()` to flush any pending data.
 
@@ -66,12 +66,28 @@ cd build
 ./unit_tests
 ```
 
+## Running as a systemd service
+
+See `binance-service.service`. Deploy:
+
+```bash
+sudo cp build/binance_service /usr/local/bin/
+sudo useradd --system --no-create-home binance-service
+sudo mkdir -p /etc/binance-service
+sudo cp config.json /etc/binance-service/
+sudo chown -R binance-service:binance-service /etc/binance-service
+sudo cp binance-service.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now binance-service
+```
+
+`Restart=always` handles process crashes; `BinanceClient`'s internal
+reconnect-with-backoff handles network-level disconnects — these are
+complementary, not redundant.
 
 ## TODO
 
 - [ ] Expand README with implementation nuances.
-- [ ] Tests for the connection layer (`BinanceClient`).
-- [ ] `systemd` unit file (`Restart=always`).
 - [ ] Proper logging.
 - [ ] Bound memory growth in `Aggregator::data_`.
 - [ ] Explicitly detect and handle the `serverShutdown` event from Binance.
