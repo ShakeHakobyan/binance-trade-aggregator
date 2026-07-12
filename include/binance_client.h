@@ -21,6 +21,9 @@ class BinanceClient {
     void run();
     void stop();
 
+    static std::string buildSubscribeMessage(const std::vector<std::string>& pairs, int id);
+    static int nextBackoffSeconds(int currentBackoff, int maxBackoff);
+
   private:
     void connect(WebSocket& ws, tcp::resolver& resolver);
     void handshake(WebSocket& ws);

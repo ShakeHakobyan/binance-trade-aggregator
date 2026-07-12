@@ -27,18 +27,24 @@ namespace {
 const std::string kHost = "stream.binance.com";
 const std::string kPort = "9443";
 const std::string kTarget = "/stream";
-constexpr int kReadTimeoutSeconds = 2; // how often readLoop rechecks stopping_
+constexpr int kReadTimeoutSeconds = 2;
 } // namespace
 
 BinanceClient::BinanceClient(std::vector<std::string> pairs, TradeQueue& queue)
     : pairs_(std::move(pairs)), queue_(queue) {
 }
 
+std::string BinanceClient::buildSubscribeMessage(const std::vector<std::string>& pairs, int id) {
+    json msg = {{"method", "SUBSCRIBE"}, {"params", pairs}, {"id", id}};
+    return msg.dump();
+}
+
+int BinanceClient::nextBackoffSeconds(int currentBackoff, int maxBackoff) {
+    return std::min(currentBackoff * 2, maxBackoff);
+}
+
 void BinanceClient::stop() {
     stopping_ = true;
-    // No socket manipulation needed here — readLoop() polls stopping_ on
-    // every read timeout (see setReadTimeout / kReadTimeoutSeconds), so it
-    // will notice and exit within kReadTimeoutSeconds at most.
 }
 
 void BinanceClient::run() {
@@ -50,12 +56,13 @@ void BinanceClient::run() {
             connectAndListen();
             backoffSeconds = 1;
         } catch (const std::exception& e) {
-            if (stopping_) break;
+            if (stopping_)
+                break;
 
             std::cerr << "[BinanceClient] " << e.what() << ". Reconnecting in " << backoffSeconds
                       << "s\n";
             std::this_thread::sleep_for(std::chrono::seconds(backoffSeconds));
-            backoffSeconds = std::min(backoffSeconds * 2, maxBackoffSeconds);
+            backoffSeconds = nextBackoffSeconds(backoffSeconds, maxBackoffSeconds);
         }
     }
     std::cout << "[BinanceClient] Stopped.\n";
@@ -87,8 +94,7 @@ void BinanceClient::setupControl(WebSocket& ws) {
 }
 
 void BinanceClient::subscribe(WebSocket& ws) {
-    json msg = {{"method", "SUBSCRIBE"}, {"params", pairs_}, {"id", 1}};
-    std::string request = msg.dump();
+    std::string request = buildSubscribeMessage(pairs_, /*id=*/1);
     ws.write(net::buffer(request));
 
     std::cout << "[BinanceClient] subscribed\n";
@@ -110,13 +116,9 @@ void BinanceClient::readLoop(WebSocket& ws) {
         ws.read(buffer, ec);
 
         if (ec) {
-            // A read timeout is expected (we set it deliberately) — just
-            // loop again, which re-checks stopping_.
             if (ec == boost::asio::error::would_block || ec == boost::asio::error::try_again) {
                 continue;
             }
-            // Any other error is a real connection problem — propagate so
-            // run() treats it as a disconnect and reconnects with backoff.
             throw beast::system_error(ec);
         }
 
