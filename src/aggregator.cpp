@@ -17,6 +17,10 @@ void Aggregator::run() {
     }
 }
 
+bool Aggregator::isWindowClosed(int64_t windowStart, int64_t nowMs) const {
+    return windowStart + windowMs_ <= nowMs;
+}
+
 StatsByTimeWindow Aggregator::extractClosedWindows(int64_t nowMs) {
     StatsByTimeWindow closed;
 
@@ -24,7 +28,7 @@ StatsByTimeWindow Aggregator::extractClosedWindows(int64_t nowMs) {
     for (auto windowIt = data_.begin(); windowIt != data_.end();) {
         int64_t windowStart = windowIt->first;
 
-        if (windowStart + windowMs_ <= nowMs) {
+        if (isWindowClosed(windowStart, nowMs)) {
             closed[windowStart] = std::move(windowIt->second);
             windowIt = data_.erase(windowIt);
         } else {

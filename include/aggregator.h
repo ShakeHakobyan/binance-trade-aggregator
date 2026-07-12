@@ -22,6 +22,8 @@ class Aggregator {
     StatsByTimeWindow extractClosedWindows(int64_t nowMs);
 
   private:
+    bool isWindowClosed(int64_t windowStart, int64_t nowMs) const;
+
     int64_t windowMs_;
     TradeQueue &queue_;
 
