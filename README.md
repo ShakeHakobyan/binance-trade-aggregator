@@ -48,3 +48,17 @@ Run tests:
 cd build
 ./unit_tests
 ```
+
+
+## TODO
+
+- [ ] `Config`.
+- [ ] Unit tests for `FileWriter`.
+- [ ] Graceful stop mechanism for all `run()` loops.
+- [ ] Expand README with implementation nuances.
+- [ ] Tests for the connection layer (`BinanceClient`).
+- [ ] `systemd` unit file (`Restart=always`).
+- [ ] Proper logging.
+- [ ] Bound memory growth in `Aggregator::data_`.
+- [ ] Explicitly detect and handle the `serverShutdown` event from Binance.
+- [ ] Dockerfile.
