@@ -5,6 +5,7 @@
 #include <boost/beast/ssl.hpp>
 #include <boost/beast/websocket.hpp>
 
+#include <atomic>
 #include <string>
 #include <vector>
 
@@ -18,15 +19,19 @@ class BinanceClient {
     BinanceClient(std::vector<std::string> pairs, TradeQueue& queue);
 
     void run();
+    void stop();
 
   private:
     void connect(WebSocket& ws, tcp::resolver& resolver);
     void handshake(WebSocket& ws);
     void setupControl(WebSocket& ws);
     void subscribe(WebSocket& ws);
+    void setReadTimeout(WebSocket& ws, int timeoutSeconds);
     void readLoop(WebSocket& ws);
     void connectAndListen();
 
     std::vector<std::string> pairs_;
     TradeQueue& queue_;
+
+    std::atomic<bool> stopping_{false};
 };

@@ -38,6 +38,23 @@ cmake --build .
   returns and removes all windows where `windowStart + aggregation_window_ms
   <= nowMs`.
 
+### Graceful shutdown
+
+`SIGINT`/`SIGTERM` set a flag checked by the main loop.
+
+- `Aggregator::stop()` closes `TradeQueue`, waking the blocked `pop()`
+  inside `run()` (`pop()` returns `nullopt`, loop exits).
+- `BinanceClient::stop()` sets an atomic flag; the read loop uses a
+  socket-level timeout (`SO_RCVTIMEO`, 2s) instead of an unbounded
+  blocking read, so it wakes up periodically and rechecks the flag
+  (cross-thread socket shutdown during a blocking read is not reliably
+  safe, so this was avoided).
+- `main()` calls both `stop()`s, joins the threads, then does one final
+  `extractClosedWindows()` + `write()` to flush any pending data.
+
+**Known limitation:** shutdown can take up to ~2s (the read timeout) to
+complete — an accepted trade-off for simplicity over async cancellation.
+
 ## Testing
 
 Unit tests use GoogleTest and cover `JsonTradeParser` and `TradeQueue`.

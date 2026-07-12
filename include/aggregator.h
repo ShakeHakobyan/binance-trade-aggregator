@@ -1,4 +1,5 @@
 #pragma once
+
 #include "trade.h"
 #include "trade_queue.h"
 #include "window_stats.h"
@@ -19,6 +20,7 @@ class Aggregator {
     void processTrade(const Trade& trade);
 
     void run();
+    void stop();
     StatsByTimeWindow extractClosedWindows(int64_t nowMs);
 
   private:

@@ -12,9 +12,16 @@ void Aggregator::processTrade(const Trade& trade) {
 
 void Aggregator::run() {
     while (true) {
-        Trade trade = queue_.pop();
-        processTrade(trade);
+        auto trade = queue_.pop();
+        if (!trade.has_value()) {
+            break;
+        }
+        processTrade(*trade);
     }
+}
+
+void Aggregator::stop() {
+    queue_.close();
 }
 
 bool Aggregator::isWindowClosed(int64_t windowStart, int64_t nowMs) const {

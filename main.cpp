@@ -4,11 +4,20 @@
 #include "file_writer.h"
 #include "trade_queue.h"
 
+#include <atomic>
 #include <chrono>
+#include <csignal>
 #include <iostream>
 #include <thread>
 
 namespace {
+
+std::atomic<bool> g_shutdownRequested{false};
+
+void handleSignal(int) {
+    g_shutdownRequested = true;
+}
+
 int64_t nowMs() {
     return std::chrono::duration_cast<std::chrono::milliseconds>(
                std::chrono::system_clock::now().time_since_epoch())
@@ -17,6 +26,9 @@ int64_t nowMs() {
 } // namespace
 
 int main(int argc, char* argv[]) {
+    std::signal(SIGINT, handleSignal);
+    std::signal(SIGTERM, handleSignal);
+
     std::string configPath = (argc > 1) ? argv[1] : "config.json";
 
     Config config;
@@ -33,13 +45,13 @@ int main(int argc, char* argv[]) {
     FileWriter writer(config.outputFilePath);
 
     std::thread networkThread([&client] { client.run(); });
-
     std::thread aggregatorThread([&aggregator] { aggregator.run(); });
 
     std::cout << "Service started. Aggregation window: " << config.aggregationWindowMs
-              << "ms, serialization interval: " << config.serializationIntervalMs << "ms.\n";
+              << "ms, serialization interval: " << config.serializationIntervalMs
+              << "ms. Press Ctrl+C to stop.\n";
 
-    while (true) {
+    while (!g_shutdownRequested) {
         std::this_thread::sleep_for(std::chrono::milliseconds(config.serializationIntervalMs));
 
         auto closedWindows = aggregator.extractClosedWindows(nowMs());
@@ -48,7 +60,16 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    std::cout << "[main] Shutdown requested, stopping components...\n";
+    client.stop();
+    aggregator.stop();
+
     networkThread.join();
     aggregatorThread.join();
+
+    auto finalWindows = aggregator.extractClosedWindows(nowMs());
+    writer.write(finalWindows);
+
+    std::cout << "[main] Stopped cleanly.\n";
     return 0;
 }
