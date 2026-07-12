@@ -12,6 +12,7 @@ add_executable(binance_service
     main.cpp
     src/aggregator.cpp
     src/binance_client.cpp
+    src/file_writer.cpp
     src/json_trade_parser.cpp
     src/trade_queue.cpp
     src/window_stats.cpp
