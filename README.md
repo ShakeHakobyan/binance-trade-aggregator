@@ -12,63 +12,173 @@ mkdir build && cd build
 conan install .. --output-folder=. --build=missing
 cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake
 cmake --build .
-./binance_service
+./binance_service ../config.json
 ```
+
+Config path defaults to `config.json` in the current working directory if
+no argument is given.
 
 ## Architecture
 
-- `Trade` — plain struct: one parsed trade (symbol, price, quantity, exchange
-  timestamp, isBuyerMaker).
-- `TradeQueue` — thread-safe queue passing `Trade` objects from the network
-  thread to the aggregation thread.
-- `JsonTradeParser` — parses raw WebSocket messages into `Trade` objects;
-  distinguishes subscription-ack control messages from actual trades.
-- `BinanceClient` — connects to Binance combined stream endpoint (`/stream`),
-  sends the `SUBSCRIBE` request for configured pairs, reads frames in a loop,
-  and reconnects with exponential backoff on any failure (network drop,
-  24h server-side disconnect, `serverShutdown` event). A fresh
-  `io_context`/socket is created on every reconnect attempt to avoid reusing
-  a socket left in an undefined state after a failure.
-- `WindowStats` — per-(symbol, window) accumulator: trade count, volume,
-  min/max price, buy/sell count. Updated incrementally via `update(Trade)`.
-- `Aggregator` — owns `data_: map<symbol, unordered_map<windowStart, WindowStats>>`.
-  `processTrade()` (private) buckets each trade by
-  `windowStart = tradeTimeMs - (tradeTimeMs % aggregation_window_ms)` and
-  updates the corresponding `WindowStats`. `extractClosedWindows(nowMs)`
-  returns and removes all windows where `windowStart + aggregation_window_ms
-  <= nowMs`.
+> Note: this section explains the *reasoning* behind the design (why
+> things are split this way, why certain data structures were chosen),
+> not just how to run the service. For usage, see Build/Testing sections.
+
+- **`Trade`** — struct containing only the fields from the raw
+  trade data that are actually needed for the statistics (symbol, price,
+  quantity, exchange timestamp, buyer/seller flag).
+- **`TradeQueue`** — thread-safe queue, network thread → aggregation
+  thread, avoiding race conditions on push/pop. `pop()` returns
+  `std::optional<Trade>` instead of `Trade` so a closed and drained queue
+  can signal no more data (`nullopt`) to a thread blocked waiting on it.
+- **`JsonTradeParser`** — split into `parseJson()`, `isServerShutdown()`,
+  and `extractTrade()`. Split specifically so `BinanceClient` can check
+  for `serverShutdown` before calling `extractTrade()` — otherwise it
+  would just fail to find trade fields and log a misleading error.
+  `serverShutdown` is sent by Binance before it closes the connection for
+  planned maintenance, so it's handled as its own case, not as a parse
+  failure.
+- **`BinanceClient`** — owns the WebSocket connection: connect,
+  subscribe, read loop, reconnect with growing delay on any failure.
+
+  `connectAndListen()` creates a fresh `io_context` and socket on every
+  attempt rather than reusing one stored on the class, so a failed
+  connection never leaves a socket in an undefined state for the next
+  retry.
+
+  The read loop uses a socket-level receive timeout (`SO_RCVTIMEO`)
+  instead of an unbounded blocking read. A timeout is not treated as an
+  error, it just gives the loop a chance to check the stop flag; any
+  other read error is treated as a real disconnect and triggers
+  reconnect.
+
+  A `serverShutdown` event is raised as an exception, so it's handled by
+  the same reconnect path as an actual disconnect, rather than needing
+  separate handling.
+
+  `buildSubscribeMessage()` and `nextBackoffSeconds()` are standalone
+  functions so they can be unit-tested without a real connection. The
+  rest of the class performs real network I/O and is verified by running
+  the service.
+- **`WindowStats`** — per-window accumulator, updated incrementally via
+  `update(Trade)`.
+- **`Aggregator`** — trades come in from the queue one at a time. Each
+  trade is not stored as-is. Instead, it immediately updates the
+  statistics for its window and symbol (min/max/volume/counts), so memory
+  use stays proportional to the number of windows in flight, not the
+  number of trades received.
+
+  How data is stored:
+
+  ```
+  windowStart (ms) -> { symbol -> WindowStats }
+
+  1000 -> { "BTCUSDT": {trades: 12, volume: ..., ...},
+            "ETHUSDT": {trades: 5,  volume: ..., ...} }
+  2000 -> { "BTCUSDT": {trades: 8, ...} }
+  ```
+
+  Keyed by window first, symbol second, so a closed window comes out as
+  one ready-to-write block (all its symbols together), matching what
+  `FileWriter` needs.
+
+  Each trade's window is found by rounding its exchange timestamp down to
+  a fixed boundary (`tradeTimeMs - tradeTimeMs % windowMs`), so windows
+  align to the epoch rather than to whenever the first trade happened to
+  arrive.
+
+  A window is closed once enough time has passed that no more trades for
+  it are expected. Closed windows are moved out (not copied) since
+  they're removed from storage right after.
+
+  `stop()` just closes the queue it blocks on. `Aggregator` has no
+  synchronization primitive of its own to wake up with.
+
+- **`FileWriter`** — writes closed windows in the required output format.
+
+  Symbols within a window are re-sorted into a `std::map` before writing,
+  since the incoming data uses `unordered_map` and would otherwise print
+  in a different, unstable order on every run.
+
+  The `timestamp=` line for a window is only written if at least one
+  symbol in it actually had trades — if every symbol in a window ended up
+  empty, nothing is written for that window at all, matching the task's
+  requirement to skip pairs with no trades.
+
+  Writes with `std::ios::app`, so each call appends rather than
+  overwriting previous output.
+- **`Config`** — loads pairs, `aggregation_window_ms`,
+  `serialization_interval_ms`, output path from JSON; throws on missing
+  file, empty `pairs`, or non-positive intervals.
+
+### Threading model
+
+Three loops, synchronized only through `TradeQueue` and `Aggregator`'s
+internal mutex — no other shared state:
+
+1. **Network** (`BinanceClient::run`) — reads, parses, pushes to queue.
+2. **Aggregation** (`Aggregator::run`) — pops continuously, buckets by
+   *exchange* time.
+3. **Serialization** (main thread) — every `serialization_interval_ms`
+   (*wall-clock*), extracts closed windows and writes them.
+
+`aggregation_window_ms` and `serialization_interval_ms` are independent by
+design — the task specifies them as two separate config values, and
+nothing in the code assumes they're equal.
+
+### `isBuyerMaker` interpretation
+
+`isBuyerMaker == true` → the trade was **seller-initiated** (buyer's order
+was already resting on the book, i.e. the maker; the seller was the
+taker). `isBuyerMaker == false` → **buyer-initiated**. This is the
+opposite of what the field name suggests at a glance, hence called out
+here rather than left to a code comment alone.
 
 ### Graceful shutdown
 
 `SIGINT`/`SIGTERM` set a flag checked by the main loop.
 
-- `Aggregator::stop()` closes `TradeQueue`, waking the blocked `pop()`
-  inside `run()` (`pop()` returns `nullopt`, loop exits).
-- `BinanceClient` — the pure, network-independent pieces: `buildSubscribeMessage()`
-  (message format, including single-pair and empty-list edge cases) and
-  `nextBackoffSeconds()` (backoff progression and cap). Socket-level logic
-  (`connect`, `handshake`, `readLoop`) performs real network I/O and is
-  verified manually, not by unit tests (see below).
-- `main()` calls both `stop()`s, joins the threads, then does one final
-  `extractClosedWindows()` + `write()` to flush any pending data.
+- `Aggregator::stop()` just calls `queue.close()` — `Aggregator` has no
+  synchronization primitive of its own, so it delegates shutdown to the
+  queue it blocks on.
+- `BinanceClient::stop()` sets an atomic flag only. The read loop uses a
+  socket-level receive timeout (`SO_RCVTIMEO`, 2s) instead of an unbounded
+  blocking read, so it wakes up on its own and rechecks the flag. A
+  cross-thread `shutdown()`/`close()` on the socket was tried first but is
+  not reliably safe while another thread is blocked in `read()` on an SSL
+  stream — replaced with the timeout approach.
+- `main()` calls both `stop()`s, joins both threads, then does one final
+  `extractClosedWindows()` + `write()` to flush anything accumulated since
+  the last scheduled write.
 
-**Known limitation:** shutdown can take up to ~2s (the read timeout) to
-complete — an accepted trade-off for simplicity over async cancellation.
+**Known limitation:** shutdown latency is bounded by the read timeout
+(~2s), not instant.
 
-## Testing
+### Failure handling
 
-Unit tests use GoogleTest and cover `JsonTradeParser` and `TradeQueue`.
+| Failure | Handling |
+|---|---|
+| WebSocket disconnect (network drop, 24h server limit) | Reconnect with exponential backoff, capped at 30s |
+| `serverShutdown` event | Detected explicitly, triggers immediate reconnect rather than waiting for the drop |
+| Missed ping/pong | Handled automatically by Boost.Beast at the protocol level |
+| Malformed/unexpected JSON | Caught in `JsonTradeParser`, message dropped, service continues |
+| File write failure (disk full, permissions) | Caught in `FileWriter`, logged, retried next interval |
+| Config missing/invalid | Fails fast at startup, does not start with bad config |
 
-Run tests:
+### Known limitations
 
-```bash
-cd build
-./unit_tests
-```
+- A trade whose window has already been extracted (i.e. arrives more than
+  `aggregation_window_ms` late relative to `serialization_interval_ms`)
+  is silently dropped — accepted trade-off for fixed-interval writes.
+- `price`/`quantity` are `double`, not a decimal type — acceptable for
+  aggregate statistics at this scope, not for exact accounting.
+- `Aggregator`'s window map is unbounded — a very long network outage
+  combined with a stalled serialization loop could grow memory
+  indefinitely (not currently guarded against).
 
 ## Running as a systemd service
 
-See `binance-service.service`. Deploy:
+See `binance-service.service`.
 
 ```bash
 sudo cp build/binance_service /usr/local/bin/
@@ -82,13 +192,24 @@ sudo systemctl enable --now binance-service
 ```
 
 `Restart=always` handles process crashes; `BinanceClient`'s internal
-reconnect-with-backoff handles network-level disconnects — these are
-complementary, not redundant.
+reconnect handles network-level disconnects — these are complementary.
+
+## Testing
+
+```bash
+cd build
+./unit_tests
+```
+
+Covers `JsonTradeParser`, `TradeQueue` (including `close()`/wake
+behavior), `Aggregator`, `WindowStats`, `FileWriter`, `Config`. For
+`BinanceClient`, only the pure functions (`buildSubscribeMessage`,
+`nextBackoffSeconds`) are unit-tested; the socket/reconnect logic
+performs real network I/O and was verified manually by running the
+service against the live endpoint and observing `output.txt`.
 
 ## TODO
 
-- [ ] Expand README with implementation nuances.
-- [ ] Proper logging.
-- [ ] Bound memory growth in `Aggregator::data_`.
-- [ ] Explicitly detect and handle the `serverShutdown` event from Binance.
-- [ ] Dockerfile.
+- [ ] Structured logging (spdlog) instead of `std::cout`/`std::cerr`.
+- [ ] Bound memory growth in `Aggregator` during prolonged outages.
+- [ ] Dockerfile for reproducible builds.
