@@ -162,3 +162,26 @@ TEST(JsonTradeParserTest, ParsesVerySmallQuantity) {
     ASSERT_TRUE(ok);
     EXPECT_DOUBLE_EQ(trade.quantity, 0.00000001);
 }
+
+TEST(JsonTradeParser, DetectsServerShutdown) {
+    json data = json::parse(R"({"e": "serverShutdown", "E": 1770123456789})");
+
+    EXPECT_TRUE(JsonTradeParser::isServerShutdown(data));
+}
+
+TEST(JsonTradeParser, DoesNotFlagRegularTradeAsServerShutdown) {
+    json data = json::parse(
+        R"({"e": "trade", "s": "BTCUSDT", "p": "100.0", "q": "1.0", "T": 123, "m": false})");
+
+    EXPECT_FALSE(JsonTradeParser::isServerShutdown(data));
+}
+
+TEST(JsonTradeParser, ParseReturnsFalseForServerShutdown) {
+    std::string raw = R"({
+        "stream": "!serverShutdown",
+        "data": {"e": "serverShutdown", "E": 1770123456789}
+    })";
+
+    Trade trade;
+    EXPECT_FALSE(JsonTradeParser::parse(raw, trade));
+}

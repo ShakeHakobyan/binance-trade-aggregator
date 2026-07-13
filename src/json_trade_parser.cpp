@@ -16,6 +16,10 @@ std::optional<json> JsonTradeParser::parseJson(const std::string& rawMessage) {
     }
 }
 
+bool JsonTradeParser::isServerShutdown(const json& data) {
+    return data.contains("e") && data["e"] == "serverShutdown";
+}
+
 bool JsonTradeParser::extractTrade(const json& data, Trade& outTrade) {
     try {
         outTrade.symbol = data.at("s").get<std::string>();
@@ -34,6 +38,10 @@ bool JsonTradeParser::parse(const std::string& rawMessage, Trade& outTrade) {
     auto dataOpt = JsonTradeParser::parseJson(rawMessage);
 
     if (!dataOpt) {
+        return false;
+    }
+
+    if (JsonTradeParser::isServerShutdown(*dataOpt)) {
         return false;
     }
 

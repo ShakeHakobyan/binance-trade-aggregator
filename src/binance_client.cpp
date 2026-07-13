@@ -124,8 +124,19 @@ void BinanceClient::readLoop(WebSocket& ws) {
 
         std::string message = beast::buffers_to_string(buffer.data());
 
+        auto dataOpt = JsonTradeParser::parseJson(message);
+        if (!dataOpt) {
+            continue;
+        }
+
+        if (JsonTradeParser::isServerShutdown(*dataOpt)) {
+            std::cout << "[BinanceClient] Received serverShutdown event, "
+                         "reconnecting proactively.\n";
+            throw std::runtime_error("serverShutdown event received");
+        }
+
         Trade trade;
-        if (JsonTradeParser::parse(message, trade)) {
+        if (JsonTradeParser::extractTrade(*dataOpt, trade)) {
             queue_.push(trade);
         }
     }
