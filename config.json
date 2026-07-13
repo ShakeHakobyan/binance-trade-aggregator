@@ -2,5 +2,6 @@
     "pairs": ["btcusdt@trade", "ethusdt@trade", "bnbusdt@trade"],
     "aggregation_window_ms": 1000,
     "serialization_interval_ms": 50000,
-    "output_file_path": "output.txt"
+    "output_file_path": "output.txt",
+    "max_open_windows": 3600
 }

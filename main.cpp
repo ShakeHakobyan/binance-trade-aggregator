@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
 
     TradeQueue queue;
     BinanceClient client(config.pairs, queue);
-    Aggregator aggregator(config.aggregationWindowMs, queue);
+    Aggregator aggregator(config.aggregationWindowMs, queue, config.maxOpenWindows);
     FileWriter writer(config.outputFilePath);
 
     std::thread networkThread([&client] { client.run(); });

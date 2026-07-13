@@ -23,6 +23,7 @@ Config Config::parseConfig(const json& parsed) {
     config.aggregationWindowMs = parsed.at("aggregation_window_ms").get<int64_t>();
     config.serializationIntervalMs = parsed.at("serialization_interval_ms").get<int64_t>();
     config.outputFilePath = parsed.value("output_file_path", "output.txt");
+    config.maxOpenWindows = parsed.value("max_open_windows", static_cast<size_t>(3600));
     return config;
 }
 
@@ -35,6 +36,9 @@ void Config::validateConfig(const Config& config) {
     }
     if (config.serializationIntervalMs <= 0) {
         throw std::runtime_error("Config: 'serialization_interval_ms' must be positive");
+    }
+    if (config.maxOpenWindows == 0) {
+        throw std::runtime_error("Config: 'max_open_windows' must be positive");
     }
 }
 

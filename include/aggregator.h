@@ -16,7 +16,7 @@ using StatsByTimeWindow = std::map<int64_t, WindowContents>;
 
 class Aggregator {
   public:
-    Aggregator(int64_t windowMs, TradeQueue& queue);
+    Aggregator(int64_t windowMs, TradeQueue& queue, size_t maxOpenWindows = 3600);
     void processTrade(const Trade& trade);
 
     void run();
@@ -25,6 +25,7 @@ class Aggregator {
 
   private:
     bool isWindowClosed(int64_t windowStart, int64_t nowMs) const;
+    void enforceWindowCap();
 
     int64_t windowMs_;
     TradeQueue& queue_;
@@ -32,4 +33,5 @@ class Aggregator {
     std::mutex mutex_;
     StatsByTimeWindow data_;
     int64_t lastClosedWindowStart_ = -1;
+    size_t maxOpenWindows_;
 };

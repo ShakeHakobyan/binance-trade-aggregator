@@ -196,19 +196,40 @@ TEST(AggregatorTest, OnlyFullyClosedWindowsAreExtractedWhenMixed) {
 }
 
 TEST(AggregatorTest, LateTradeAfterWindowExtractedIsDropped) {
+    int64_t windowMs = 1000;
+    int64_t windowStart = 1000;
+
     TradeQueue queue;
-    Aggregator agg(1000, queue);
+    Aggregator agg(windowMs, queue);
+    agg.processTrade(makeTrade("BTCUSDT", 100.0, 1.0, 1500, false));
 
-    Trade t1{"BTCUSDT", 100.0, 1.0, 1500, false};
-    agg.processTrade(t1);
+    StatsByTimeWindow expectedFirst;
+    expectedFirst[windowStart]["BTCUSDT"] = WindowStats(1, 100.0, 100.0, 100.0, 1, 0);
+    auto actualFirst = agg.extractClosedWindows(2000);
+    expectWindowsEqual(expectedFirst, actualFirst);
 
-    auto closed = agg.extractClosedWindows(2000);
-    ASSERT_EQ(closed.size(), 1u);
-    EXPECT_EQ(closed[1000]["BTCUSDT"].tradesNum, 1);
+    agg.processTrade(makeTrade("BTCUSDT", 999.0, 1.0, 1600, false));
 
-    Trade lateTrade{"BTCUSDT", 999.0, 1.0, 1600, false};
-    agg.processTrade(lateTrade);
+    StatsByTimeWindow expectedSecond;
+    auto actualSecond = agg.extractClosedWindows(3000);
+    expectWindowsEqual(expectedSecond, actualSecond);
+}
 
-    auto closedAgain = agg.extractClosedWindows(3000);
-    EXPECT_TRUE(closedAgain.find(1000) == closedAgain.end());
+TEST(AggregatorTest, DropsOldestWindowWhenCapExceeded) {
+    int64_t windowMs = 1000;
+    size_t maxOpenWindows = 2;
+
+    TradeQueue queue;
+    Aggregator agg(windowMs, queue, maxOpenWindows);
+
+    agg.processTrade(makeTrade("BTCUSDT", 100.0, 1.0, 1500, false));
+    agg.processTrade(makeTrade("BTCUSDT", 100.0, 1.0, 2500, false));
+    agg.processTrade(makeTrade("BTCUSDT", 100.0, 1.0, 3500, false));
+
+    StatsByTimeWindow expected;
+    expected[2000]["BTCUSDT"] = WindowStats(1, 100.0, 100.0, 100.0, 1, 0);
+    expected[3000]["BTCUSDT"] = WindowStats(1, 100.0, 100.0, 100.0, 1, 0);
+
+    auto actual = agg.extractClosedWindows(10000);
+    expectWindowsEqual(expected, actual);
 }

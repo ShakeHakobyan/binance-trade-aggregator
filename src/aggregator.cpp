@@ -1,7 +1,8 @@
 #include "aggregator.h"
 #include <iostream>
 
-Aggregator::Aggregator(int64_t windowMs, TradeQueue& queue) : windowMs_(windowMs), queue_(queue) {
+Aggregator::Aggregator(int64_t windowMs, TradeQueue& queue, size_t maxOpenWindows)
+    : windowMs_(windowMs), queue_(queue), maxOpenWindows_(maxOpenWindows) {
 }
 
 void Aggregator::processTrade(const Trade& trade) {
@@ -17,6 +18,20 @@ void Aggregator::processTrade(const Trade& trade) {
     }
 
     data_[windowStart][trade.symbol].update(trade);
+    enforceWindowCap();
+}
+
+void Aggregator::enforceWindowCap() {
+    while (data_.size() > maxOpenWindows_) {
+        auto oldestIt = data_.begin();
+        std::cerr << "[Aggregator] Open window count exceeded cap (" << maxOpenWindows_
+                  << "), dropping oldest window " << oldestIt->first << " without writing it.\n";
+
+        if (oldestIt->first > lastClosedWindowStart_) {
+            lastClosedWindowStart_ = oldestIt->first;
+        }
+        data_.erase(oldestIt);
+    }
 }
 
 void Aggregator::run() {

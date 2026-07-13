@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <nlohmann/json.hpp>
 #include <string>
@@ -13,6 +14,7 @@ class Config {
     int64_t aggregationWindowMs = 1000;
     int64_t serializationIntervalMs = 1000;
     std::string outputFilePath = "output.txt";
+    size_t maxOpenWindows = 3600;
 
     static Config loadFromFile(const std::string& path);
 
