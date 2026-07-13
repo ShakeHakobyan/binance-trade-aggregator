@@ -9,8 +9,8 @@ interval.
 
 ```bash
 mkdir build && cd build
-conan install .. --output-folder=. --build=missing
-cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake
+conan install .. --output-folder=. --build=missing -s build_type=Release
+cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
 cmake --build .
 ./binance_service ../config.json
 ```
@@ -20,9 +20,7 @@ no argument is given.
 
 ## Architecture
 
-> Note: this section explains the *reasoning* behind the design (why
-> things are split this way, why certain data structures were chosen),
-> not just how to run the service. For usage, see Build/Testing sections.
+> Note: this section explains the *reasoning* behind the design. For usage, see Build/Testing sections.
 
 - **`Trade`** — struct containing only the fields from the raw
   trade data that are actually needed for the statistics (symbol, price,
@@ -62,6 +60,9 @@ no argument is given.
   the service.
 - **`WindowStats`** — per-window accumulator, updated incrementally via
   `update(Trade)`.
+  In `update()`, `isBuyerMaker == true` increments `sellCount`
+  and `false` increments `buyCount` — the reverse of what the field name
+  suggests at a glance.
 - **`Aggregator`** — trades come in from the queue one at a time. Each
   trade is not stored as-is. Instead, it immediately updates the
   statistics for its window and symbol (min/max/volume/counts), so memory
@@ -126,34 +127,6 @@ internal mutex — no other shared state:
 design — the task specifies them as two separate config values, and
 nothing in the code assumes they're equal.
 
-### `isBuyerMaker` interpretation
-
-`isBuyerMaker == true` → the trade was **seller-initiated** (buyer's order
-was already resting on the book, i.e. the maker; the seller was the
-taker). `isBuyerMaker == false` → **buyer-initiated**. This is the
-opposite of what the field name suggests at a glance, hence called out
-here rather than left to a code comment alone.
-
-### Graceful shutdown
-
-`SIGINT`/`SIGTERM` set a flag checked by the main loop.
-
-- `Aggregator::stop()` just calls `queue.close()` — `Aggregator` has no
-  synchronization primitive of its own, so it delegates shutdown to the
-  queue it blocks on.
-- `BinanceClient::stop()` sets an atomic flag only. The read loop uses a
-  socket-level receive timeout (`SO_RCVTIMEO`, 2s) instead of an unbounded
-  blocking read, so it wakes up on its own and rechecks the flag. A
-  cross-thread `shutdown()`/`close()` on the socket was tried first but is
-  not reliably safe while another thread is blocked in `read()` on an SSL
-  stream — replaced with the timeout approach.
-- `main()` calls both `stop()`s, joins both threads, then does one final
-  `extractClosedWindows()` + `write()` to flush anything accumulated since
-  the last scheduled write.
-
-**Known limitation:** shutdown latency is bounded by the read timeout
-(~2s), not instant.
-
 ### Failure handling
 
 | Failure | Handling |
@@ -170,8 +143,7 @@ here rather than left to a code comment alone.
 - A trade whose window has already been extracted (i.e. arrives more than
   `aggregation_window_ms` late relative to `serialization_interval_ms`)
   is silently dropped — accepted trade-off for fixed-interval writes.
-- `price`/`quantity` are `double`, not a decimal type — acceptable for
-  aggregate statistics at this scope, not for exact accounting.
+- shutdown latency is bounded by the read timeout (~2s), not instant.
 - `Aggregator`'s window map is unbounded — a very long network outage
   combined with a stalled serialization loop could grow memory
   indefinitely (not currently guarded against).

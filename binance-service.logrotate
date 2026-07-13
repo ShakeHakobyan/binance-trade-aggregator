@@ -1,0 +1,8 @@
+/etc/binance-service/output.txt {
+    daily
+    rotate 7
+    compress
+    missingok
+    notifempty
+    copytruncate
+}
