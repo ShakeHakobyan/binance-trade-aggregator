@@ -31,4 +31,5 @@ class Aggregator {
 
     std::mutex mutex_;
     StatsByTimeWindow data_;
+    int64_t lastClosedWindowStart_ = -1;
 };

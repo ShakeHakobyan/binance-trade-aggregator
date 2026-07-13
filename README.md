@@ -138,11 +138,18 @@ nothing in the code assumes they're equal.
 | File write failure (disk full, permissions) | Caught in `FileWriter`, logged, retried next interval |
 | Config missing/invalid | Fails fast at startup, does not start with bad config |
 
+## Log rotation
+
+`binance-service.logrotate` rotates `output.txt` daily via `logrotate`,
+keeping 7 days of history with `copytruncate` to avoid unbounded growth.
+
 ### Known limitations
 
-- A trade whose window has already been extracted (i.e. arrives more than
-  `aggregation_window_ms` late relative to `serialization_interval_ms`)
-  is silently dropped — accepted trade-off for fixed-interval writes.
+- A trade whose window has already been extracted and written is dropped
+  (with a log line) rather than silently reopening a closed window and
+  producing a duplicate, incomplete `timestamp=` block on the next
+  serialization cycle. Aggregator tracks the high-water mark of the last
+  window it has closed and rejects anything at or before it.
 - shutdown latency is bounded by the read timeout (~2s), not instant.
 - `Aggregator`'s window map is unbounded — a very long network outage
   combined with a stalled serialization loop could grow memory

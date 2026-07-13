@@ -1,4 +1,5 @@
 #include "aggregator.h"
+#include <iostream>
 
 Aggregator::Aggregator(int64_t windowMs, TradeQueue& queue) : windowMs_(windowMs), queue_(queue) {
 }
@@ -7,6 +8,14 @@ void Aggregator::processTrade(const Trade& trade) {
     int64_t windowStart = trade.tradeTimeMs - (trade.tradeTimeMs % windowMs_);
 
     std::lock_guard<std::mutex> lock(mutex_);
+
+    if (windowStart <= lastClosedWindowStart_) {
+        std::cerr << "[Aggregator] Dropping late trade for " << trade.symbol << " (window "
+                  << windowStart << " already closed, last closed " << lastClosedWindowStart_
+                  << ")\n";
+        return;
+    }
+
     data_[windowStart][trade.symbol].update(trade);
 }
 
@@ -37,6 +46,9 @@ StatsByTimeWindow Aggregator::extractClosedWindows(int64_t nowMs) {
 
         if (isWindowClosed(windowStart, nowMs)) {
             closed[windowStart] = std::move(windowIt->second);
+            if (windowStart > lastClosedWindowStart_) {
+                lastClosedWindowStart_ = windowStart;
+            }
             windowIt = data_.erase(windowIt);
         } else {
             ++windowIt;

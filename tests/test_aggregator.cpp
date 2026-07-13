@@ -194,3 +194,21 @@ TEST(AggregatorTest, OnlyFullyClosedWindowsAreExtractedWhenMixed) {
 
     expectWindowsEqual(expected, actual);
 }
+
+TEST(AggregatorTest, LateTradeAfterWindowExtractedIsDropped) {
+    TradeQueue queue;
+    Aggregator agg(1000, queue);
+
+    Trade t1{"BTCUSDT", 100.0, 1.0, 1500, false};
+    agg.processTrade(t1);
+
+    auto closed = agg.extractClosedWindows(2000);
+    ASSERT_EQ(closed.size(), 1u);
+    EXPECT_EQ(closed[1000]["BTCUSDT"].tradesNum, 1);
+
+    Trade lateTrade{"BTCUSDT", 999.0, 1.0, 1600, false};
+    agg.processTrade(lateTrade);
+
+    auto closedAgain = agg.extractClosedWindows(3000);
+    EXPECT_TRUE(closedAgain.find(1000) == closedAgain.end());
+}
