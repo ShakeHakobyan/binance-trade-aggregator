@@ -178,6 +178,8 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now binance-service
 ```
 
+Logs: `journalctl -u binance-service -f`. Output file: `/etc/binance-service/output.txt`.
+
 `Restart=always` handles process crashes. `BinanceClient`'s internal
 reconnect handles network-level disconnects. These are complementary.
 
