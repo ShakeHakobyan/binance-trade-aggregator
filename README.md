@@ -20,23 +20,23 @@ no argument is given.
 
 ## Architecture
 
-> Note: this section explains the *reasoning* behind the design. For usage, see Build/Testing sections.
+> Note: this section explains the reasoning behind the design. For usage, see Build/Testing sections.
 
-- **`Trade`** — struct containing only the fields from the raw
-  trade data that are actually needed for the statistics (symbol, price,
-  quantity, exchange timestamp, buyer/seller flag).
-- **`TradeQueue`** — thread-safe queue, network thread → aggregation
-  thread, avoiding race conditions on push/pop. `pop()` returns
+- **`Trade`** — struct with only the fields from the raw trade data that
+  are actually needed for the statistics (symbol, price, quantity,
+  exchange timestamp, buyer/seller flag).
+- **`TradeQueue`** — thread-safe queue, network thread to aggregation
+  thread, avoids race conditions on push/pop. `pop()` returns
   `std::optional<Trade>` instead of `Trade` so a closed and drained queue
   can signal no more data (`nullopt`) to a thread blocked waiting on it.
 - **`JsonTradeParser`** — split into `parseJson()`, `isServerShutdown()`,
   and `extractTrade()`. Split specifically so `BinanceClient` can check
-  for `serverShutdown` before calling `extractTrade()` — otherwise it
+  for `serverShutdown` before calling `extractTrade()`, otherwise it
   would just fail to find trade fields and log a misleading error.
   `serverShutdown` is sent by Binance before it closes the connection for
   planned maintenance, so it's handled as its own case, not as a parse
   failure.
-- **`BinanceClient`** — owns the WebSocket connection: connect,
+- **`BinanceClient`** — owns the WebSocket connection. Connect,
   subscribe, read loop, reconnect with growing delay on any failure.
 
   `connectAndListen()` creates a fresh `io_context` and socket on every
@@ -46,7 +46,7 @@ no argument is given.
 
   The read loop uses a socket-level receive timeout (`SO_RCVTIMEO`)
   instead of an unbounded blocking read. A timeout is not treated as an
-  error, it just gives the loop a chance to check the stop flag; any
+  error, it just gives the loop a chance to check the stop flag. Any
   other read error is treated as a real disconnect and triggers
   reconnect.
 
@@ -56,13 +56,12 @@ no argument is given.
 
   `buildSubscribeMessage()` and `nextBackoffSeconds()` are standalone
   functions so they can be unit-tested without a real connection. The
-  rest of the class performs real network I/O and is verified by running
+  rest of the class does real network I/O and is verified by running
   the service.
-- **`WindowStats`** — per-window accumulator, updated incrementally via
-  `update(Trade)`.
-  In `update()`, `isBuyerMaker == true` increments `sellCount`
-  and `false` increments `buyCount` — the reverse of what the field name
-  suggests at a glance.
+- **`WindowStats`** —  per-window accumulator, updated incrementally via
+  `update(Trade)`. In `update()`, `isBuyerMaker == true` increments
+  `sellCount` and `false` increments `buyCount`, the reverse of what the
+  field name suggests at a glance.
 - **`Aggregator`** — trades come in from the queue one at a time. Each
   trade is not stored as-is. Instead, it immediately updates the
   statistics for its window and symbol (min/max/volume/counts), so memory
@@ -102,29 +101,29 @@ no argument is given.
   in a different, unstable order on every run.
 
   The `timestamp=` line for a window is only written if at least one
-  symbol in it actually had trades — if every symbol in a window ended up
+  symbol in it actually had trades. If every symbol in a window ended up
   empty, nothing is written for that window at all, matching the task's
   requirement to skip pairs with no trades.
 
   Writes with `std::ios::app`, so each call appends rather than
   overwriting previous output.
-- **`Config`** — loads pairs, `aggregation_window_ms`,
-  `serialization_interval_ms`, output path from JSON; throws on missing
+- **`Config`**: loads pairs, `aggregation_window_ms`,
+  `serialization_interval_ms`, output path from JSON. Throws on missing
   file, empty `pairs`, or non-positive intervals.
 
 ### Threading model
 
 Three loops, synchronized only through `TradeQueue` and `Aggregator`'s
-internal mutex — no other shared state:
+internal mutex, no other shared state:
 
 1. **Network** (`BinanceClient::run`) — reads, parses, pushes to queue.
 2. **Aggregation** (`Aggregator::run`) — pops continuously, buckets by
-   *exchange* time.
+   exchange time.
 3. **Serialization** (main thread) — every `serialization_interval_ms`
-   (*wall-clock*), extracts closed windows and writes them.
+   (wall-clock), extracts closed windows and writes them.
 
 `aggregation_window_ms` and `serialization_interval_ms` are independent by
-design — the task specifies them as two separate config values, and
+design. The task specifies them as two separate config values, and
 nothing in the code assumes they're equal.
 
 ### Failure handling
@@ -145,15 +144,24 @@ keeping 7 days of history with `copytruncate` to avoid unbounded growth.
 
 ### Known limitations
 
-- A trade whose window has already been extracted and written is dropped
-  (with a log line) rather than silently reopening a closed window and
-  producing a duplicate, incomplete `timestamp=` block on the next
-  serialization cycle. Aggregator tracks the high-water mark of the last
-  window it has closed and rejects anything at or before it.
-- shutdown latency is bounded by the read timeout (~2s), not instant.
-- `Aggregator`'s window map is unbounded — a very long network outage
-  combined with a stalled serialization loop could grow memory
-  indefinitely (not currently guarded against).
+- Shutdown latency is bounded by the read timeout (~2s) in most cases,
+  but not guaranteed: the synchronous connect/handshake and backoff
+  sleep (up to 30s) do not check the stop flag.
+- The `SO_RCVTIMEO` timeout is applied to an SSL stream; its behavior on
+  a genuinely idle connection has not been verified in practice.
+- Trades lost during a connection outage are not recoverable — the
+  WebSocket stream has no replay mechanism. REST-based backfill
+  (`historicalTrades`) could close this gap but requires tracking the
+  last seen trade ID, merging into already-written windows, and
+  handling separate REST rate limits; out of scope for this task.
+- `TradeQueue` has no size cap. `Aggregator`'s window map is bounded by
+  `max_open_windows`, but sustained producer/consumer imbalance can
+  still grow the queue unbounded.
+- Reconnect backoff caps at 30s but retries indefinitely; a permanent
+  failure (e.g. DNS misconfiguration) is not distinguished from a
+  transient one, and no alerting exists beyond stderr logs.
+- A trade dropped by the late-trade check or the open-window cap is
+  unrecoverable, by design, in favor of fixed-interval output.
 
 ## Running as a systemd service
 
@@ -170,8 +178,8 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now binance-service
 ```
 
-`Restart=always` handles process crashes; `BinanceClient`'s internal
-reconnect handles network-level disconnects — these are complementary.
+`Restart=always` handles process crashes. `BinanceClient`'s internal
+reconnect handles network-level disconnects. These are complementary.
 
 ## Testing
 
@@ -183,12 +191,14 @@ cd build
 Covers `JsonTradeParser`, `TradeQueue` (including `close()`/wake
 behavior), `Aggregator`, `WindowStats`, `FileWriter`, `Config`. For
 `BinanceClient`, only the pure functions (`buildSubscribeMessage`,
-`nextBackoffSeconds`) are unit-tested; the socket/reconnect logic
-performs real network I/O and was verified manually by running the
-service against the live endpoint and observing `output.txt`.
+`nextBackoffSeconds`) are unit-tested. The socket/reconnect logic
+does real network I/O and was verified manually by running the
+service against the live endpoint and watching `output.txt`.
 
 ## TODO
 
-- [ ] Structured logging (spdlog) instead of `std::cout`/`std::cerr`.
-- [ ] Bound memory growth in `Aggregator` during prolonged outages.
-- [ ] Dockerfile for reproducible builds.
+- [ ] Structured logging (spdlog)
+- [ ] Async I/O in BinanceClient so stop() is actually bounded
+- [ ] Cap TradeQueue size
+- [ ] REST backfill for outage gaps
+- [ ] Dockerfile
