@@ -1,5 +1,9 @@
 # Binance Trade Aggregation Service
 
+> **Note:** This is my personal dev/playground branch. I'm using it to
+> try things out and may pick up items from the TODO list at any point.
+> Not meant to reflect a finished or reviewed state.
+
 C++ service that connects to the Binance WebSocket API, subscribes to
 multiple trade streams, aggregates trade statistics per symbol over
 configurable time windows, and writes results to a file at a configurable
