@@ -32,6 +32,7 @@ constexpr int kReadTimeoutSeconds = 2;
 
 BinanceClient::BinanceClient(std::vector<std::string> pairs, TradeQueue& queue)
     : pairs_(std::move(pairs)), queue_(queue) {
+    sslCtx_.set_default_verify_paths();
 }
 
 std::string BinanceClient::buildSubscribeMessage(const std::vector<std::string>& pairs, int id) {
@@ -45,6 +46,12 @@ int BinanceClient::nextBackoffSeconds(int currentBackoff, int maxBackoff) {
 
 void BinanceClient::stop() {
     stopping_ = true;
+    net::post(ioc_, [this] {
+        if (ws_) {
+            boost::beast::error_code ec;
+            boost::beast::get_lowest_layer(*ws_).cancel(ec);
+        }
+    });
 }
 
 void BinanceClient::run() {
@@ -143,16 +150,13 @@ void BinanceClient::readLoop(WebSocket& ws) {
 }
 
 void BinanceClient::connectAndListen() {
-    net::io_context ioc;
-    ssl::context ctx(ssl::context::tlsv12_client);
-    ctx.set_default_verify_paths();
-    tcp::resolver resolver(ioc);
-    WebSocket ws(ioc, ctx);
+    tcp::resolver resolver(ioc_);
+    ws_ = std::make_unique<WebSocket>(ioc_, sslCtx_);
 
-    connect(ws, resolver);
-    handshake(ws);
-    setupControl(ws);
-    subscribe(ws);
-    setReadTimeout(ws, kReadTimeoutSeconds);
-    readLoop(ws);
+    connect(*ws_, resolver);
+    handshake(*ws_);
+    setupControl(*ws_);
+    subscribe(*ws_);
+    setReadTimeout(*ws_, kReadTimeoutSeconds);
+    readLoop(*ws_);
 }

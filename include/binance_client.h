@@ -1,16 +1,19 @@
 #pragma once
 
+#include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ssl/context.hpp>
 #include <boost/beast/ssl.hpp>
 #include <boost/beast/websocket.hpp>
 
 #include <atomic>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "trade_queue.h"
 
+namespace net = boost::asio;
 using tcp = boost::asio::ip::tcp;
 using WebSocket = boost::beast::websocket::stream<boost::beast::ssl_stream<tcp::socket>>;
 
@@ -35,6 +38,10 @@ class BinanceClient {
 
     std::vector<std::string> pairs_;
     TradeQueue& queue_;
+
+    net::io_context ioc_;
+    boost::asio::ssl::context sslCtx_{boost::asio::ssl::context::tlsv12_client};
+    std::unique_ptr<WebSocket> ws_;
 
     std::atomic<bool> stopping_{false};
 };
